@@ -1,0 +1,14 @@
+{
+    "number real samples_0": 12500,
+    "true matches_0": 10809,
+    "number predicted samples_0": 11506,
+    "recall_0": 0.86472,
+    "precision_0": 0.9394229097861985,
+    "f1-score_0": 0.9005248687828044,
+    "number real samples_1": 12500,
+    "true matches_1": 11803,
+    "number predicted samples_1": 13494,
+    "recall_1": 0.94424,
+    "precision_1": 0.8746850452052765,
+    "f1-score_1": 0.9081326459952296
+}

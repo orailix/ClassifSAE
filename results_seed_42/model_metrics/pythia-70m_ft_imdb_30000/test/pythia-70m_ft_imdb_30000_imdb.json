@@ -1,0 +1,15 @@
+{
+    "Global accuracy": 0.91032,
+    "recall_0": 0.91096,
+    "precision_0": 0.9097954618088846,
+    "f1-score_0": 0.910377358490566,
+    "true matches_0": 11387,
+    "number real samples_0": 12500,
+    "number predicted samples_0": 12516,
+    "recall_1": 0.90968,
+    "precision_1": 0.9108458827298943,
+    "f1-score_1": 0.9102625680435479,
+    "true matches_1": 11371,
+    "number real samples_1": 12500,
+    "number predicted samples_1": 12484
+}

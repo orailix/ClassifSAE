@@ -1,0 +1,192 @@
+
+####### Feature 0 ##########
+
+
+
+Russian Spacecraft Heads for International Space Station A Russian Soyuz spacecraft carrying two Russian cosmonauts and one American astronaut has reached orbit, after blasting off from the Baikonur cosmodrome in Kazakhstan.	7.0403370459515955
+
+Modified US space shuttle ready to fly next spring NASA said Thursday it had corrected flaws that caused the destruction of the space shuttle Columbia in February 2003 and that a modified shuttle would be ready to resume flights sometime next Spring.	6.564217629638244
+
+New Crew Prepares for Launch to International Space Station All three men heading to the international space station in a Russian-built Soyuz spacecraft this Thursday will be riding the tiny craft for the first time, breaking with 35 years of tradition.	6.6641004694496635
+
+NASA looking at May launch Citing technical challenges due to hurricanes, NASA officials said that the initial space shuttle mission for Return to Flight will slip from March to May 2005.	6.573694292492302
+
+Astronauts arrive at space station A RUSSIAN spacecraft has delivered three astronauts to the International Space Station, overcoming docking system problems which had delayed its launch.	6.877477366519967
+
+Mission accomplished: US astronauts are home at last American astronaut Mike Fincke and Russian commander Gennady Padalka descended to Earth in remote Kazakstan late Saturday aboard a Soyuz space capsule.	6.546784460371692
+
+Nasa to resume shuttle missions The American space agency Nasa says the first space shuttle mission since the Columbia disaster of 2003 is to be launched next May or early June.	6.896910969573838
+
+Launcher eyes shuttle succession Boeing's huge Delta 4-Heavy rocket, set for lift-off on Saturday, may play a role in life after the space shuttle.	6.511658161549575
+
+Next space station crew to launch Expedition 10, the next crew to live on the International Space Station (ISS), is set to launch from Kazakhstan. US astronaut Leroy Chiao and Russian cosmonaut Salizhan Sharipov will leave the Baikonur Cosmodrome on a Soyuz rocket at 0306GMT on Thursday.	6.699010975408442
+
+NASA puts off space shuttle flights until at least May WASHINGTON: The US space agency NASA has put off resumption of space shuttle flights from March until at least May, the agency has said.	6.736300198770163
+
+####### Feature 1 ##########
+
+
+
+HP Hugs JBoss Tighter HP (Quote, Chart) deepened its relationship with open source software concern JBoss, agreeing to become a major source of support for its application server and Linux.	4.351698048826017
+
+Vendors Upgrade Development Tools OCTOBER 18, 2004 (COMPUTERWORLD) - IBM and Borland Software Corp. last week separately brought out upgrades to their development tool lines that executives said add support for heterogeneous environments and 	4.406277661509893
+
+IBM launches top-end Power5 servers IBM has expanded the top end of its eServer range with three multiple-processor systems aimed at datacentres and large enterprise clients.	4.396368061924323
+
+IBM Claims Computing Crown (The Motley Fool) The Motley Fool - IBM (NYSE: IBM - News) has new bragging rights. Press reports indicate that the technology giant has created the world's fastest supercomputer two years after a Japanese computer claimed that title.	4.490562914147189
+
+Oracle launches Business Integlligence 10g Oracle introduced a new BI platform yesterday, Business Intelligence 10g that rolls up into one solution all of their BI tools. However, more interesting than the nitty-gritty details of what is included is the back story taking place at the same time.	4.302571436486273
+
+Intel executive: EM64T has set back Itanium SAN FRANCISCO -- Intel Corp.'s decision to begin shipping versions of x86 processors that are capable of 64-bit computing has slowed down the adoption of the company's high-end Itanium processors, a senior executive acknowledged Tuesday during a question and answer session at the Intel Developer Forum (IDF) in San Francisco.	4.415607777435193
+
+Dell upgrades high-performance cluster line To boost performance for high-end users, Dell Inc. is upgrading its high-performance computing clusters by adding support for larger Topspin InfiniBand switches and PCIe host channel adapters.	4.694339881765073
+
+Oracle 1Q Earnings Rise 16 Percent (AP) AP - Business software giant Oracle Corp. said Tuesday that first-quarter earnings rose 16 percent driven by new database license sales that rose 19 percent.	4.6283393570284
+
+Big Blue veteran heads to EMC EMC has hired a former IBM veteran to be its chief technology officer, in what appears to be the latest step in EMC #39;s evolution from a data storage hardware specialist to a more comprehensive computing company.	4.386842630963271
+
+IBM Aims New DB2 at Rivals IBM (Quote, Chart) announced its first major database refresh in almost two years with new features from the company #39;s autonomic computing vault.	4.461547793485151
+
+####### Feature 3 ##########
+
+
+
+Dell cuts prices on many corporate products Dell on Monday said it had cut prices by as much as fifth for a range of products aimed at US corporate customers, as the computer maker passed along savings from cheaper components.	5.869732250526124
+
+Sprint, SBC Announce Wi-Fi Roaming Pact Customers of Sprint Corp. and SBC Communications Inc. will be able to use both companies' wireless Internet connections with less hassle under a reciprocal deal announced Friday.	5.726743803606437
+
+SIA: Chip sales to hit record, flatten Worldwide semiconductor sales will hit an all-time high in 2004 but stay relatively flat in 2005 before climbing again over the next two years, according to the Semiconductor Industry Association.	5.585479744527957
+
+Korean and Japanese Phone Makers Win -Survey  AMSTERDAM (Reuters) - South Korean mobile phone makers  continued a rapid move up the global market rankings during the  third quarter, while growth in the wider mobile phone market  slowed, a survey found on Wednesday.	6.066916279440705
+
+Report: IBM's PC business up for sale IBM Corp. has put its PC business up for sale, according to a story published on Friday on the Web site of The New York Times.	5.823485722723824
+
+Online advertising up 43pc in US NEW YORK - US internet ad revenue jumped to a record US\$2.37 billion (\$3.5 billion) in the second quarter, surpassing the highest levels of the dotcom era.	5.485971301540761
+
+AOL Dumping Some Broadband unsupported writes  quot;Just days after news that AOL will be breaking up into 4 business units, AOL is telling existing broadband customers in 9 Southern states to find a new carrier.	5.665350540593721
+
+August chip sales up Global semiconductor sales rose 1.1 percent to \$18.2 billion in August from the previous month and it appears as though chip inventories are declining, an industry trade group said Thursday.	5.779870318058937
+
+Research Is Definitely in Motion The Blackberry wireless device maker is straining to exceed expectations.	5.530015237942057
+
+Global sales of mobile phones hit record levels PARIS Global cellphone sales rose to record levels in the second quarter as Nokia clawed back some of its lost market share, according to figures released Thursday.	6.194308599655738
+
+####### Feature 13 ##########
+
+
+
+CBS #39;s Moonves Gives Loyalists a Piece of the Eye #39;s Pie Viacom co-president and CBS Chairman Leslie Moonves officially whacked the head of the media conglom #39;s television studio yesterday, and divvied up the job among loyal CBS staffers.	2.413974996050471
+
+BASS moving headquarters to Florida The Bass Anglers Sportsman Society is moving its headquarters to Central Florida. The bass fishing organization, based in Montgomery since its inception in 1967, announced Monday 	2.37095576929268
+
+Disney Rules Out New Deal with Pixar Studios In January Disney and Pixar terminated their talks to extend a distribution partnership that has created such cartoon hits as  quot;Finding Nemo quot; and the  quot;Toy Story quot; series.	2.571342846888808
+
+Internosis Will Relocate To Greenbelt in October  Internosis Inc., an information technology company in Arlington, plans to move its headquarters to Greenbelt in October. The relocation will bring 170 jobs to Prince George's County.	2.452065590180248
+
+HGS Picks Watkins as New Chief Executive  Human Genome Sciences Inc. plans to announce today that it has hired a 20-year product development veteran from Abbott Laboratories Inc. as chief executive. H. Thomas Watkins, 51, will face the challenge of completing the Rockville company's makeover from gene hunter to drug marketer.	2.279227367423906
+
+DreamWorks Officer Quits DreamWorks SKG, the studio that created the  quot;Shrek #39; #39; films, said yesterday that Helene Hahn would step down as chief operating officer.	2.4274111896041317
+
+Pay Adviser Talks of Role in Ovitz Deal The outside adviser who helped draft the 1995 employment agreement for the president of Walt Disney, Michael S. Ovitz, testified on Tuesday that he had reservations 	2.2423565731991237
+
+McDonald #39;s CEO Charlie Bell devoted working career to McDonald #39;s OAK BROOK, Ill. Cancer has forced Charlie Bell to step down as CEO of the restaurant chain to which he #39;s devoted most of his working career.	2.450091609667218
+
+CBS Realigns Entertainment Divisions eslie Moonves, the co-president of Viacom, yesterday realigned the management of the company #39;s CBS entertainment division and Paramount television production studio, promising smoother and greater interaction between the two.	2.7774891412587968
+
+Nike co-founder stepping down president effective December 28 after more than a year-long search. Knight, 66, who also will give up his title of president,. chairman, quot; Knight said in a statement on Thursday.	2.495763239493604
+
+####### Feature 0 ##########
+
+
+
+Russian Spacecraft Heads for International Space Station A Russian Soyuz spacecraft carrying two Russian cosmonauts and one American astronaut has reached orbit, after blasting off from the Baikonur cosmodrome in Kazakhstan.	7.0403370459515955
+
+Modified US space shuttle ready to fly next spring NASA said Thursday it had corrected flaws that caused the destruction of the space shuttle Columbia in February 2003 and that a modified shuttle would be ready to resume flights sometime next Spring.	6.564217629638244
+
+New Crew Prepares for Launch to International Space Station All three men heading to the international space station in a Russian-built Soyuz spacecraft this Thursday will be riding the tiny craft for the first time, breaking with 35 years of tradition.	6.6641004694496635
+
+NASA looking at May launch Citing technical challenges due to hurricanes, NASA officials said that the initial space shuttle mission for Return to Flight will slip from March to May 2005.	6.573694292492302
+
+Astronauts arrive at space station A RUSSIAN spacecraft has delivered three astronauts to the International Space Station, overcoming docking system problems which had delayed its launch.	6.877477366519967
+
+Mission accomplished: US astronauts are home at last American astronaut Mike Fincke and Russian commander Gennady Padalka descended to Earth in remote Kazakstan late Saturday aboard a Soyuz space capsule.	6.546784460371692
+
+Nasa to resume shuttle missions The American space agency Nasa says the first space shuttle mission since the Columbia disaster of 2003 is to be launched next May or early June.	6.896910969573838
+
+Launcher eyes shuttle succession Boeing's huge Delta 4-Heavy rocket, set for lift-off on Saturday, may play a role in life after the space shuttle.	6.511658161549575
+
+Next space station crew to launch Expedition 10, the next crew to live on the International Space Station (ISS), is set to launch from Kazakhstan. US astronaut Leroy Chiao and Russian cosmonaut Salizhan Sharipov will leave the Baikonur Cosmodrome on a Soyuz rocket at 0306GMT on Thursday.	6.699010975408442
+
+NASA puts off space shuttle flights until at least May WASHINGTON: The US space agency NASA has put off resumption of space shuttle flights from March until at least May, the agency has said.	6.736300198770163
+
+####### Feature 1 ##########
+
+
+
+HP Hugs JBoss Tighter HP (Quote, Chart) deepened its relationship with open source software concern JBoss, agreeing to become a major source of support for its application server and Linux.	4.351698048826017
+
+Vendors Upgrade Development Tools OCTOBER 18, 2004 (COMPUTERWORLD) - IBM and Borland Software Corp. last week separately brought out upgrades to their development tool lines that executives said add support for heterogeneous environments and 	4.406277661509893
+
+IBM launches top-end Power5 servers IBM has expanded the top end of its eServer range with three multiple-processor systems aimed at datacentres and large enterprise clients.	4.396368061924323
+
+IBM Claims Computing Crown (The Motley Fool) The Motley Fool - IBM (NYSE: IBM - News) has new bragging rights. Press reports indicate that the technology giant has created the world's fastest supercomputer two years after a Japanese computer claimed that title.	4.490562914147189
+
+Oracle launches Business Integlligence 10g Oracle introduced a new BI platform yesterday, Business Intelligence 10g that rolls up into one solution all of their BI tools. However, more interesting than the nitty-gritty details of what is included is the back story taking place at the same time.	4.302571436486273
+
+Intel executive: EM64T has set back Itanium SAN FRANCISCO -- Intel Corp.'s decision to begin shipping versions of x86 processors that are capable of 64-bit computing has slowed down the adoption of the company's high-end Itanium processors, a senior executive acknowledged Tuesday during a question and answer session at the Intel Developer Forum (IDF) in San Francisco.	4.415607777435193
+
+Dell upgrades high-performance cluster line To boost performance for high-end users, Dell Inc. is upgrading its high-performance computing clusters by adding support for larger Topspin InfiniBand switches and PCIe host channel adapters.	4.694339881765073
+
+Oracle 1Q Earnings Rise 16 Percent (AP) AP - Business software giant Oracle Corp. said Tuesday that first-quarter earnings rose 16 percent driven by new database license sales that rose 19 percent.	4.6283393570284
+
+Big Blue veteran heads to EMC EMC has hired a former IBM veteran to be its chief technology officer, in what appears to be the latest step in EMC #39;s evolution from a data storage hardware specialist to a more comprehensive computing company.	4.386842630963271
+
+IBM Aims New DB2 at Rivals IBM (Quote, Chart) announced its first major database refresh in almost two years with new features from the company #39;s autonomic computing vault.	4.461547793485151
+
+####### Feature 3 ##########
+
+
+
+Dell cuts prices on many corporate products Dell on Monday said it had cut prices by as much as fifth for a range of products aimed at US corporate customers, as the computer maker passed along savings from cheaper components.	5.869732250526124
+
+Sprint, SBC Announce Wi-Fi Roaming Pact Customers of Sprint Corp. and SBC Communications Inc. will be able to use both companies' wireless Internet connections with less hassle under a reciprocal deal announced Friday.	5.726743803606437
+
+SIA: Chip sales to hit record, flatten Worldwide semiconductor sales will hit an all-time high in 2004 but stay relatively flat in 2005 before climbing again over the next two years, according to the Semiconductor Industry Association.	5.585479744527957
+
+Korean and Japanese Phone Makers Win -Survey  AMSTERDAM (Reuters) - South Korean mobile phone makers  continued a rapid move up the global market rankings during the  third quarter, while growth in the wider mobile phone market  slowed, a survey found on Wednesday.	6.066916279440705
+
+Report: IBM's PC business up for sale IBM Corp. has put its PC business up for sale, according to a story published on Friday on the Web site of The New York Times.	5.823485722723824
+
+Online advertising up 43pc in US NEW YORK - US internet ad revenue jumped to a record US\$2.37 billion (\$3.5 billion) in the second quarter, surpassing the highest levels of the dotcom era.	5.485971301540761
+
+AOL Dumping Some Broadband unsupported writes  quot;Just days after news that AOL will be breaking up into 4 business units, AOL is telling existing broadband customers in 9 Southern states to find a new carrier.	5.665350540593721
+
+August chip sales up Global semiconductor sales rose 1.1 percent to \$18.2 billion in August from the previous month and it appears as though chip inventories are declining, an industry trade group said Thursday.	5.779870318058937
+
+Research Is Definitely in Motion The Blackberry wireless device maker is straining to exceed expectations.	5.530015237942057
+
+Global sales of mobile phones hit record levels PARIS Global cellphone sales rose to record levels in the second quarter as Nokia clawed back some of its lost market share, according to figures released Thursday.	6.194308599655738
+
+####### Feature 13 ##########
+
+
+
+CBS #39;s Moonves Gives Loyalists a Piece of the Eye #39;s Pie Viacom co-president and CBS Chairman Leslie Moonves officially whacked the head of the media conglom #39;s television studio yesterday, and divvied up the job among loyal CBS staffers.	2.413974996050471
+
+BASS moving headquarters to Florida The Bass Anglers Sportsman Society is moving its headquarters to Central Florida. The bass fishing organization, based in Montgomery since its inception in 1967, announced Monday 	2.37095576929268
+
+Disney Rules Out New Deal with Pixar Studios In January Disney and Pixar terminated their talks to extend a distribution partnership that has created such cartoon hits as  quot;Finding Nemo quot; and the  quot;Toy Story quot; series.	2.571342846888808
+
+Internosis Will Relocate To Greenbelt in October  Internosis Inc., an information technology company in Arlington, plans to move its headquarters to Greenbelt in October. The relocation will bring 170 jobs to Prince George's County.	2.452065590180248
+
+HGS Picks Watkins as New Chief Executive  Human Genome Sciences Inc. plans to announce today that it has hired a 20-year product development veteran from Abbott Laboratories Inc. as chief executive. H. Thomas Watkins, 51, will face the challenge of completing the Rockville company's makeover from gene hunter to drug marketer.	2.279227367423906
+
+DreamWorks Officer Quits DreamWorks SKG, the studio that created the  quot;Shrek #39; #39; films, said yesterday that Helene Hahn would step down as chief operating officer.	2.4274111896041317
+
+Pay Adviser Talks of Role in Ovitz Deal The outside adviser who helped draft the 1995 employment agreement for the president of Walt Disney, Michael S. Ovitz, testified on Tuesday that he had reservations 	2.2423565731991237
+
+McDonald #39;s CEO Charlie Bell devoted working career to McDonald #39;s OAK BROOK, Ill. Cancer has forced Charlie Bell to step down as CEO of the restaurant chain to which he #39;s devoted most of his working career.	2.450091609667218
+
+CBS Realigns Entertainment Divisions eslie Moonves, the co-president of Viacom, yesterday realigned the management of the company #39;s CBS entertainment division and Paramount television production studio, promising smoother and greater interaction between the two.	2.7774891412587968
+
+Nike co-founder stepping down president effective December 28 after more than a year-long search. Knight, 66, who also will give up his title of president,. chairman, quot; Knight said in a statement on Thursday.	2.495763239493604

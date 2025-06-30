@@ -1,0 +1,120 @@
+
+####### Feature 471 ##########
+
+
+
+Google puts desktop search privacy up front Google has announced a new desktop search application that enables users to search their e-mail, files, web history, and chats. Perhaps learning from previous mistakes, Google says it has designed the product  quot;from the ground up to respect user privacy.	17.408823013305664
+
+Microsoft issues patches for 7 software flaws Microsoft has warned of seven newly found flaws in its software that could allow an attacker to steal data and take over a personal computer running the Windows operating system.	17.298603057861328
+
+IBM protects passwords with PC chip New PCs will ship with a chip designed to thwart hackers--a hardware approach that's said to be safer than software.	17.056047439575195
+
+Microsoft #39;s big fix: Security patch now on the market For the past few years, viruses have attacked Microsoft #39;s operating system, Web browser or e-mail programs seemingly on a weekly basis.	17.139684677124023
+
+Microsoft Will Replace Fake Copies of XP U.K. users will be able to replace pirated versions of Windows that they have purchased.	17.082109451293945
+
+Microsoft Unveils Software to Find Files (AP) AP - Microsoft Corp. on Monday joined the battle for supremacy in so-called desktop search, introducing software for quickly locating files on personal computers that challenges Google's two-month-old rival product.	17.449188232421875
+
+Microsoft: scan for spyware before downloading SP2 Microsoft last week warned Windows XP users to scour their systems for spyware before downloading Service Pack 2. An Associated Press report quoted Microsoft executives saying some spyware could cause computers to freeze upon installation.	17.29559898376465
+
+Microsoft buy comes with strings attached A software company that Microsoft acquired this week to help beef up computer security may come with a bug of its own--a company claiming ownership of the programs.	17.294658660888672
+
+Microsoft spends 1bn to keep out the hackers The growing threat of hackers and viruses has prompted Microsoft to roll out a billion- dollar upgrade of its Windows computer operating system to strengthen security.	17.617847442626953
+
+Skype releases Pocket PC software Software allows users of personal digital assistants to make free calls using Wi-Fi networks.	16.99797248840332
+
+####### Feature 362 ##########
+
+
+
+Space Capsule Heading Back to Earth A space capsule holding atoms collected from solar wind was en route to a tricky rendezvous with Earth, offering scientists the first material NASA has brought back from space in nearly three decades.	11.87746810913086
+
+NASA scramjet goes for Mach 10 burn NASA #39;s X-43A scramjet will on Monday undergo its third test flight during which scientists will attempt to push the vehicle to Mach 10.	11.238272666931152
+
+Stunt pilots to snag a falling NASA craft NASA #39;s three-year effort to bring some genuine star dust back to Earth is set for a dramatic finale Sept. 8 when Hollywood helicopter pilots will attempt a midair retrieval 	11.406505584716797
+
+Cracks in Martian rock point to watery past LOS ANGELES - NASA #39;s Mars rover, Opportunity, has found more signs that rocks on the Red Planet were once submerged in water. Data sent by Opportunity suggest a crater was drenched a second time after drying out, scientists said.	11.19825267791748
+
+Cassini flies past Titan; pictures expected tonight NASA #39;s Cassini spacecraft streaked by Saturn #39;s smoggy moon Titan today, targeted to pass within just 750 miles of the planet-sized satellite to give scientists their first 	11.472382545471191
+
+Astronomers ready for comet-smashing mission NASA and university astronomers are eagerly awaiting the launch of a space probe bound to collide with a comet and give researchers a glimpse inside the solar systems icy wanderers.	11.19071102142334
+
+Titan Photos Pose New Questions Photographs and radar surveys from the Cassini spacecraft #39;s Tuesday-night flyby of Saturn #39;s mysterious moon Titan are raising more questions than they #39;re answering, say NASA scientists.	11.274765014648438
+
+US Spacecraft to Probe Origin of Gamma Rays Far Beyond Our Galaxy The US space agency, NASA, launched a satellite Saturday that scientists hope will help them locate the sources of mysterious gamma ray explosions, the 	11.103535652160645
+
+Tiny telescope detects a giant planet A tiny telescope has spotted a giant planet circling a faraway star, using a technique that could open a new phase of planetary discovery, scientists say.	11.770938873291016
+
+Genesis Spacecraft Prepares to Return to Earth with a Piece of the Sun In a dramatic ending that marks a beginning in scientific research, NASA's Genesis spacecraft is set to swing by Earth and jettison a sample return capsule filled with particles of the Sun that may ultimately tell us more about the genesis of our solar system.	11.591988563537598
+
+####### Feature 315 ##########
+
+
+
+Oracle chairman says can close gap with SAP - report Oracle Corp can close the gap with SAP, the world #39;s biggest software company, after buying US rival PeopleSoft, Oracle #39;s Chairman Jeff Henley said in an interview published on Wednesday.	6.78898286819458
+
+IBM as PeopleSoft #39;s Hero? Hardly Big Blue --a white knight? It #39;s easy to see how industry watchers got carried away with speculation that IBM (IBM ) might be riding to rescue of beleaguered PeopleSoft (PSFT ). On Sept.	6.237889766693115
+
+Cisco #39;s Perfigo Acquisition Delivers Policy Compliance To Channel In a move that targets the increased threats of worms and viruses to networked businesses, Cisco Systems Thursday said it will acquire privately owned endpoint compliance vendor Perfigo in a deal worth approximately \$74 million.	5.839786052703857
+
+Novell reaffirms open source strategy Novell is putting open source and identity management centre stage at its European user conference this week. The networking firm announced that Novell Open Enterprise Server (OES), which includes Novell #39;s 	6.876433849334717
+
+High-Tech Start-Up Strives For Open-Source Compatibility SourceLabs could create some buzz because of its pedigree team of founders. The company is led by Chief Executive Byron Sebastian, a former executive at San Jose #39;s BEA Systems, who founded the company in spring.	7.4649505615234375
+
+PeopleSoft gets closer to IBM As the threat of a hostile takeover by Oracle rumbles on, PeopleSoft has announced a \$1bn partnership with IBM. Speaking at PeopleSoft #39;s user conference in San Francisco yesterday, the company #39;s chief executive 	6.537942886352539
+
+IBM BladeCenter specification picks up speed IBM on Friday announced it has signed up 115 companies since early September to develop for its eServer BladeCenter open specification it co-authored with Intel.	5.9826788902282715
+
+Intel Taps Otellini As Next CEO Intel #39;s board, as expected, has named Paul Otellini to succeed Craig Barrett as CEO effective next May 18, the company announced Thursday.	5.8559160232543945
+
+JBoss 4.0 Released JBoss, the self-proclaimed Professional Open Source company, released JBoss Application Server 4.0 today. The announcement follows closely behind the announcements of JBossCache 1.1 and the company #39;s new partnership with Sleepycat Software.	7.190657138824463
+
+PeopleSoft CEO Conway maintains defiant tone SEPTEMBER 21, 2004 (IDG NEWS SERVICE) - With 15,000 attendees at PeopleSoft Inc. #39;s Connect 2004 user show waiting to hear how the company would handle Oracle Corp.	5.871983051300049
+
+####### Feature 743 ##########
+
+
+
+Science counts species on brink A list of 15,000 species threatened with extinction - many of them by human activity - is published.	8.056770324707031
+
+Plan Would Turn Restore Wash. Estuary NISQUALLY NATIONAL WILDLIFE REFUGE, Wash. - A 15-year plan would restore salt marshes and mudflats for migrating salmon at the Nisqually National Wildlife Refuge, more than 100 years after the farmland was drained and diked.	9.013713836669922
+
+U.S. Wildlife Refuges Facing Grave Threats A sweeping wildlife preserve in southwestern Arizona is among the nation's 10 most endangered refuges, due in large part to illegal drug and immigrant traffic and Border Patrol operations, a conservation group said Friday.	9.277438163757324
+
+Dubai first to breed at-risk bird A zoo in the Gulf has bred a bird which is threatened by the fast pace of development in the region.	8.161820411682129
+
+Invading Bullfrogs Appear Nearly Unstoppable The North American bullfrog population is booming. That may sound like good news, but it isn't #151;not when the frog has leaped far beyond its native habitat.	8.183465003967285
+
+Catalina Foxes Back After Near Extinction (AP) AP - A unique subspecies of fox that is about the size of a house cat is back from the brink of extinction on Santa Catalina Island and can survive on its own thanks to a captive breeding program, the head of a nonprofit group that manages most of the island said Tuesday.	8.329791069030762
+
+Threat of Extinction Looms Over Larger Species Being the biggest dog may pay off at feeding time, but species that grow too large may be more vulnerable to extinction, new research suggests. Over 50 million years a succession of large carnivores evolved in North America, diversified, and then died out.	9.905351638793945
+
+Raised by Others, Birds Use Code to Find Their Kind Like the ugly duckling, cowbirds are raised by other bird species. So how do they find each other as adults? A new study says they have a "password," among other things.	8.366695404052734
+
+Local group joins suit to de-list endangered species Bob Briggs wifes family has owned about 1,000 acres of redwood forest off Waddell Creek since 1913. He doesnt clearcut, and logs about once a decade.	10.898600578308105
+
+Anglers Have Big Impact on Fish Numbers -- Study Recreational anglers may be responsible for landing nearly 25 percent of over-fished salt water species caught off US coasts, a study released on Thursday suggests.	9.114234924316406
+
+####### Feature 163 ##########
+
+
+
+The Blog Confusion \\I hear that we have a new word - vlog.  The amount of confusion this will result\in should be terrifying.\\My appologies to Abbott and Costello...  I couldn't resist.\\Abbott: I say Blogs's on first, Vlogs's on second, and Blogosphere's on third.\\Costello: Is Blog the publisher?\\Abbott: Yes.\\Costello: Is Blog going to have the video too?\\Abbott: Yes.\\Costello: And you don't know the fellows' names?\\Abbott: Well I should.\\Costello: Well then Blogs publishing the story?\\Abbott: Yes.\\Costello: I mean the persons's name.\\Abbott: Blog.\\Costello: The guy on first.\\Abbott: Blog!\\Costello: The first publisher.\\Abbott: Blog.\\Costello: The guy writing...\\Abbott: Blogs the publisher!\...\\	5.646966934204102
+
+FOAFKey: FOAF, PGP, Key Distribution, and Bloom Filters \\FOAF/LOAF  and bloom filters have a lot of interesting properties for social\network and whitelist distribution.\\I think we can go one level higher though and include GPG/OpenPGP key\fingerpring distribution in the FOAF file for simple web-of-trust based key\distribution.\\What if we used FOAF and included the PGP key fingerprint(s) for identities?\This could mean a lot.  You include the PGP key fingerprints within the FOAF\file of your direct friends and then include a bloom filter of the PGP key\fingerprints of your entire whitelist (the source FOAF file would of course need\to be encrypted ).\\Your whitelist would be populated from the social network as your client\discovered new identit...\\	4.6129889488220215
+
+Sparkle starts shipping GeForce 6600 GT AGP &lt;a href="http://www.hardwareanalysis.com/content/article/1755/"&gt;GeForce 6600GT AGP, as good as it gets?&lt;/a&gt; &lt;font size=-1 color=#6f6f6f&gt;&lt;nobr&gt;Hardware Analysis&lt;/nobr&gt;	5.189121246337891
+
+So Long XMLHack! \\"It's been a lot of fun writing XMLhack since 1999, but it's time for us to take\a rest."\\"XMLhack has always been run by volunteers writing in their spare time, and now\most of us have so little of that precious commodity it's infeasible to keep the\site going at anything like the rate we want it to be."\\"As editor, I'd like to extend my grateful thanks to all the contributors over\time, a list of whom you can see on the contributors page. My special thanks go\to Simon St.Laurent, my co-conspirator from the start."\\So long guys!\\I've been a subscriber to XMLHack for probably &gt; 3 years now.  They were one of\the earlier blog-like sites to have RSS in what I'd call a'modern' and rich\f...\\	4.807035446166992
+
+FSB FUD over FOI, you cry &lt;strong&gt;Letters&lt;/strong&gt; The postbag, and your miscellaneous musings	6.940300941467285
+
+Symantec Firewall/VPN Appliance 200/200R (firmware builds prior to &lt;b&gt;...&lt;/b&gt; Rigel Kent Security  amp; Advisory Services notified Symantec of three high-risk vulnerabilities they identified in the Symantec Firewall/VPN Appliance during an assessment.	4.579401969909668
+
+Socially Responsible Funds on a Tear Don't be too impressed -- great returns don't always mean much.	4.658605575561523
+
+PSP: Region Free There have been essentially four questions sent into the PSP Mailbag -- four questions, and a heck of a lot of hate mail. Those questions are: When is PSP shipping, what will PSP cost, how long will PSP #39;s 	4.548708915710449
+
+McData offers SAN consolidation McData plans to introduce a new SAN router this week designed to connect the growing number of isolated SAN networks in corporations.&lt;p&gt;ADVERTISEMENT&lt;/p&gt;&lt;p&gt;&lt;img src="http://ad.doubleclick.net/ad/idg.us.ifw.general/sbcspotrssfeed;sz=1x1;ord=200301151450?" width="1" height="1" border="0"/&gt;&lt;a href="http://ad.doubleclick.net/clk;9228975;9651165;a?http://www.infoworld.com/spotlights/sbc/main.html?lpid0103035400730000idlp"&gt;SBC Case Study: Crate   Barrel&lt;/a&gt;&lt;br/&gt;What sold them on improving their network? A system that could cut management costs from the get-go. Find out more.&lt;/p&gt;	4.467682838439941
+
+Treo 650 on Monday? \\The blogs  are buzzing  that the Treo 650 will be released on Monday.\\From Gizmodo:\\"Not only have they announced special "news" next Monday at the CTIA Wireless\Conference in San Francisco, earlier this week someone with PalmOne\accidentally sort of, you know, told me. I told them I'd keep quiet as long as\they did, but if they're going to go and announce it with a wink and a nod, I\think I've done my part."\\If they do this right I'll be sporting a Treo 650 soon! \\Of course if this is true:\\"File it under hoping I'm wrong. Several reports have filtered in from people\who have had hands-on time with pre-release Sprint versions of the upcoming\Treo 650. These reports say that the Treo wi...\\	5.261166572570801

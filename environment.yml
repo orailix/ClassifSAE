@@ -1,0 +1,49 @@
+name: ClassifSAE_env
+channels:
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=5.1
+  - bzip2=1.0.8
+  - ca-certificates=2024.7.2
+  - ld_impl_linux-64=2.38
+  - libffi=3.4.4
+  - libgcc-ng=11.2.0
+  - libgomp=11.2.0
+  - libstdcxx-ng=11.2.0
+  - libuuid=1.41.5
+  - ncurses=6.4
+  - openssl=3.0.14
+  - pip=24.0
+  - python=3.10.14
+  - readline=8.2
+  - setuptools=69.5.1
+  - sqlite=3.45.3
+  - tk=8.6.14
+  - wheel=0.43.0
+  - xz=5.4.6
+  - zlib=1.2.13
+  - pip:
+    - datasets==2.20.0
+    - einops==0.8.0
+    - gensim==4.3.3
+    - huggingface-hub==0.24.2
+    - jaxtyping==0.2.36
+    - joblib==1.4.2
+    - loguru==0.7.2
+    - matplotlib==3.9.1
+    - nltk==3.9.1
+    - numpy==1.26.4
+    - plotly==5.23.0
+    - pyyaml==6.0.1
+    - safetensors==0.4.5
+    - scikit-learn==1.5.1
+    - sentence-transformers==3.4.1
+    - transformer-lens==2.9.1
+    - torch==2.4.0
+    - tqdm==4.66.4
+    - sentence-transformers==3.4.1
+    - transformers==4.43.3
+    - typer==0.12.3
+    - wandb==0.17.5
+

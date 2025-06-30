@@ -1,0 +1,120 @@
+
+####### Feature 591 ##########
+
+
+
+WebEx Launches Sales Center WebEx Communications is expanding its Web conferencing service with an offering designed for sales professionals, the company plans to announce this week.	22.410919189453125
+
+Search providers seek video, find challenges Internet search providers are reacting to users #39; rising interest in finding video content on the Web, while acknowledging that there are steep challenges that need to be overcome.	22.6575984954834
+
+Sony launches music players with MP3 support The company has just announced the release of two flash-memory-based devices, the Walkman NW-E99 and NW-E95, in Europe. The music players can play songs in MP3 and Sony #39;s own Atrac file format.	22.287511825561523
+
+Grid bids to save the world Hoping to harness a few million of the personal computers not already running the SETIhome screensaver, IBM and United Devices yesterday launched the World Community Grid to act as a clearing house for humanitarian IT projects.	22.425094604492188
+
+Microsoft/Swatch Offer New Wireless Watch Microsoft and Swatch announced a new line of wireless data watches named Paparazzi. The watches offer news, sports, weather and stock quotes, among other snippets of content, via Microsoft #39;s MSN Direct wireless data service.	22.373668670654297
+
+MmO2 Announces 3G Mobile Data Network Launch Customers will be able to download film clips, audio and video, interactive multiplayer games, multimedia music tracks,  quot;push-to-watch quot; services, as well as access large e-mail attachments.	22.51769256591797
+
+First Look: RemoteTV Offers Slick Media Streaming Belkin's latest product lets you effortlessly share digital content within the house, but is it lawful?	22.27260398864746
+
+IBM BladeCenter specification picks up speed IBM on Friday announced it has signed up 115 companies since early September to develop for its eServer BladeCenter open specification it co-authored with Intel.	22.26397132873535
+
+IBM plans Web meeting service, takes aim at WebEx IBM's new Lotus Web Conferencing Service, expected to be offered next month, requires that users simply register an account and have an Internet connection, a Web browser and a phone.	22.282133102416992
+
+Polycom announces desktop videoconferencing software Polycom made several announcements today, including software that puts videoconferencing capability on standard desktops with third-party cameras.	22.457460403442383
+
+####### Feature 1960 ##########
+
+
+
+In the E.R., Learning to Love the PC The keyboard is mightier than the whiteboard at an emergency room in the Bronx, where the use of computers is now a staple.	19.585268020629883
+
+Microsoft  amp; Novell Rumble Over Linux While its always interesting to watch two equally opinionated groups go at it, particularly over something as fundamental as whether Linux is worth it; the current fight is comical at best.	19.237037658691406
+
+Business Technology: Microsoft And Its Blind Spot: Linux Steve Ballmer #39;s letter to customers said nothing about the widespread reality of tens of thousands of Microsoft customers who are eager to deploy BOTH Windows and Linux.	19.200546264648438
+
+Dell recalls 4.4m notebook power adaptors Dell today asked 4.4m notebook users to return their power adaptors after it admitted these peripherals pose both a fire and electric shock hazard.	19.460338592529297
+
+Avoid Security Tools You Don't Need Many technologies may be a waste of time and money, researcher says.	19.346715927124023
+
+Novell counters Microsoft's Linux 'facts' with 'truth' In a battle of dueling memos and e-mails, Novell CEO Jack Messman and Microsoft CEO Steve Ballmer are each touting their own software -- and criticizing the competition.	19.144107818603516
+
+Help wanted by IT services firms The growing services industry is hiring, but tech workers looking for a job may need to do more than brush up on their coding.	19.25543212890625
+
+Hard Drive: SP Your XP, RSN Don #39;t have Windows XP? Listen up anyway, because there #39;s a lesson to learn, not to mention sly put downs you can use to annoy your Windows-XP-using-friends so they #39;ll finally break down and admit 	19.114168167114258
+
+Microsoft corrals changes for Longhorn With SP2 out the door, Microsoft turns sights to Longhorn--which won't look quite as expected.	19.500761032104492
+
+Longhorn announcements barely a blimp on IT radar While developers are naturally curious over tweaks to the Longhorn road map, many IT administrators barely take notice. Enterprise IT customers typically lag at least 	19.19985580444336
+
+####### Feature 1381 ##########
+
+
+
+Experts Predict Mount St. Helens Eruption (AP) AP - The flurry of earthquakes at Mount St. Helens intensified further Thursday, and one scientist put the chance of a small eruption happening in the next few days at 70 percent.	15.280563354492188
+
+Cassini to Look at Saturn's Giant Moon (AP) AP - The theory that Saturn's giant moon Titan has oceans or seas of liquid methane and ethane faced its best test yet Tuesday.	15.715152740478516
+
+Mount St. Helens Sprouts Magma Extension (AP) AP - The new lava lobe inside Mount St. Helens' crater has sprouted a piston-like protrusion the size of a 30-story building  #151; glowing red at night.	15.963117599487305
+
+Cassini Spies Two Little Saturn Moons (AP) AP - NASA's Cassini spacecraft has spied two new little moons around satellite-rich Saturn, the space agency said Monday.	15.310638427734375
+
+Cassini flies past Titan; pictures expected tonight NASA #39;s Cassini spacecraft streaked by Saturn #39;s smoggy moon Titan today, targeted to pass within just 750 miles of the planet-sized satellite to give scientists their first 	14.398004531860352
+
+Scientists: Volcano Monitoring Funds Low (AP) AP - For lack of funds, more than a third of the nation's "truly dangerous" volcanos lack even a seismometer for detecting signs of an impending eruption, scientists say.	15.066556930541992
+
+NASA Cassini Image: Gazing Down at Saturn #39;s Rings Cassini pierced the ring plane and rounded Saturn on Oct. 27, 2004, capturing this view of the dark portion of the rings. A portion of the planet #39;s atmosphere is visible here, as is its shadow on the surface of the rings.	14.602195739746094
+
+Cassini Heads Toward Giant Moon on Saturn (AP) AP - The U.S.-European spacecraft Cassini hurtled Tuesday toward its closest encounter yet with Saturn's giant moon Titan.	14.943670272827148
+
+Glacier Grows in Mount St. Helen's Crater (AP) AP - While earthquakes, steam and magma are getting all the attention on Mount St. Helens these days, the volcano's most unique feature could be the icy epitome of slow motion that has sprouted on its flanks in the last two decades: its glacier.	15.273975372314453
+
+More Evidence for Past Water on Mars Summary - (Aug 22, 2004) NASA #39;s Spirit rover has dug up plenty of evidence on slopes of  quot;Columbia Hills quot; that water once covered the area.	14.658395767211914
+
+####### Feature 911 ##########
+
+
+
+Virus  #39;talks #39; to victims Virus writers have created a piece of malware that  #39;talks #39; to victims. The Amus email worm uses Windows Speech Engine (which is built-in to Windows XP) to deliver a curious message to infected users.	8.526473999023438
+
+New strain of Skulls Trojan hits smart phones Mobile phones running Symbian's Series 60 operating system are the target of a new strain of the Skulls Trojan horse program. The new Trojan comes with the Cabir.B worm, which, unlike the first version of the virus, can spread to other phones within reach of Bluetooth broadcasting range.	7.842287540435791
+
+Sony launches music players with MP3 support The company has just announced the release of two flash-memory-based devices, the Walkman NW-E99 and NW-E95, in Europe. The music players can play songs in MP3 and Sony #39;s own Atrac file format.	7.735171318054199
+
+Cherry OS: New Emulator Runs Mac OS On Windows Hardware A company called MXS announced a new software emulator called Cherry OS that makes it possible to install Mac OS X onto x86 hardware (running Windows).	8.052891731262207
+
+New Trojan Targets Adware New Trojan Targets Adware\\Antivirus maker Symantec has reported the arrival of a spooky Trojan Horse online, which does something unique. Codenamed Downloader.Lunii, it attacks and even removes advertisement enabled softwares, which are generally considered harmful for the system. On execution of the code, it tries to kill the processes associated...	8.714068412780762
+
+IBM to use dual-core Opteron Big Blue will use AMD's chip in a high-performance server but isn't yet planning a general-purpose Opteron system.	7.7927350997924805
+
+Sun's Looking Glass Provides 3D View Developers get early code for new operating system'skin' still being crafted.	7.745500564575195
+
+Skulls Trojan keelhauls Symbian phones Users with Symbian-based mobile phones have been hit by malicious code that disables smartphone features. Skulls, a Trojan horse program that poses as gaming software, is one of the first examples of malicious code to successfully infect mobiles.	9.0397367477417
+
+Linux groups patch image flaw com December 8, 2004, 2:48 PM PT. Several flaws in common Linux code used to process graphics in the GNOME desktop environment could allow an attacker to compromise a computer that 	7.766072750091553
+
+Halo 2 vs Xbox hacks p2pnet.net News:- Xbox add-ons that let users run items not produced by Microsoft have been out there almost since Day One.  quot;Hackers who equip their Xboxes with mod chips and other upgrades such as bigger 	8.039254188537598
+
+####### Feature 1548 ##########
+
+
+
+Climate change and unfamiliar species leave Inuit lost for words Global warming is increasingly rendering Inuit and other Arctic peoples at a loss for words. They simply do not have names in their languages for the temperate species flocking up from the south.	18.348878860473633
+
+South Seas Islands Pin Future on Geotourism The Cook Islands receive more tourists per capita than any other South Pacific destination. Now authorities are revamping their tourism strategy to focus on preservation.	18.893085479736328
+
+Storms batter Cornish coastline \Flooding causes chaos for homeowners all along Cornwall's south coast as 80mph winds hit land.	19.040040969848633
+
+Atlantis "Evidence" Found in Spain, Ireland In 360 B.C. the Greek philosopher Plato described an island he called Atlantis. Now contradicting new evidence claims the fabled city-state was based on a real place.	20.02858543395996
+
+Dubai first to breed at-risk bird A zoo in the Gulf has bred a bird which is threatened by the fast pace of development in the region.	18.306791305541992
+
+Arctic team finds ship remains A team retracing the route of a group of Victorian Arctic explorers have found parts of their 172-year-old ship.	18.797443389892578
+
+Titantic is a treasure to be protected, explorer says Legendary explorer Robert Ballard was nervous this summer as he prepared to return to the Titanic for the first time since he discovered the famous shipwreck nearly two decades ago.	19.566476821899414
+
+Aids warning over bushmeat trade Meat from African wild animals being sold illegally in the UK is spreading a virus similar to HIV, a leading scientist warns.	18.26787757873535
+
+Tribe challenges American origins Some of the earliest settlers of America may have been from Australia, southern Asia, and the Pacific, not northern Asia, research suggests.	20.61483383178711
+
+World #39;s  #39;worst plunderers #39; named HUMAN beings are plundering the earth #39;s resources at an alarming and unsustainable rate, and Australians are among the worst offenders.	18.496400833129883

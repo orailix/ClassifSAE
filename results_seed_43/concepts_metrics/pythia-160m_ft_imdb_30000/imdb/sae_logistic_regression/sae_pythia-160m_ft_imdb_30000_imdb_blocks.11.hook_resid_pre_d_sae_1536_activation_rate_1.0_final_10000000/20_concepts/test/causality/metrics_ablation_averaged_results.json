@@ -1,0 +1,29 @@
+{
+    "Proportion of ablation per segment": [
+        25,
+        50,
+        75,
+        100
+    ],
+    "Global (averaged over categories) absolute accuracy change": [
+        -0.0004800260066986084,
+        -0.21794003248214722,
+        -0.21810001134872437,
+        -0.2181200087070465
+    ],
+    "Global  (averaged over categories) TVD": [
+        0.009177636355161667,
+        0.23006348684430122,
+        0.251515656709671,
+        0.2549205645918846
+    ],
+    "Global  (averaged over categories) Label-flip rate": [
+        0.005600000033155084,
+        0.25506001035682857,
+        0.2569800103083253,
+        0.2571200104430318
+    ],
+    "Averaged (over features) conditional label-flip rate": 0.001327814781689085,
+    "Averaged (over features) Conditional TVD": 0.0017483351215560106,
+    "Averaged (over features) Conditional Absolute Accuracy change": 6.307661533355713e-05
+}

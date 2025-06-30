@@ -1,0 +1,17 @@
+{
+    "avg_jaccard": 0.038753719323343025,
+    "redundancy": 1.692684217489086,
+    "coverage": 0.9946052631578948,
+    "cv_score": 0.7590073900343548,
+    "c_uci_score": 2.0727147399764636,
+    "c_npmi_score": 0.23591212498541037,
+    "Averaged mean cosine similarity over the dataset": 0.0543033592402935,
+    "Weighted Averaged ConceptSim": 0.13072548221245997,
+    "Unweighted Averaged ConceptSim": 0.14866017599900563,
+    "SentenceSim(k) for k from 1 to 4": [
+        0.1215312292549685,
+        0.1494218600059973,
+        0.16910978864898232,
+        0.19651297623912492
+    ]
+}

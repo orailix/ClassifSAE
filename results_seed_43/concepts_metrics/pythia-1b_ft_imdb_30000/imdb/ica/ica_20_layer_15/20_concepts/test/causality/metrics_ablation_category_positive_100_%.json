@@ -1,0 +1,29 @@
+{
+    "category": "positive",
+    "Percentage ablation of the segment": 100,
+    "Ablated features": [
+        10,
+        0,
+        14,
+        9,
+        5,
+        12,
+        19,
+        13
+    ],
+    "Global Absolute Accuracy change": -0.4198799729347229,
+    "Global Total Variation Distance with regard to original predictions": 0.4693525731563568,
+    "Global label-flip rate": 0.46700000762939453,
+    "number real samples_0": 12500,
+    "true matches_0": 12213,
+    "number predicted samples_0": 23583,
+    "recall_0": 0.97704,
+    "precision_0": 0.5178730441419667,
+    "f1-score_0": 0.6769392788847934,
+    "number real samples_1": 12500,
+    "true matches_1": 1130,
+    "number predicted samples_1": 1417,
+    "recall_1": 0.0904,
+    "precision_1": 0.7974594213126324,
+    "f1-score_1": 0.16239131996838396
+}

@@ -1,0 +1,96 @@
+
+####### Feature 7 ##########
+
+
+
+Consumer Prices Climb; Jobless Claims Up (AP) AP - Consumer prices barely budged in August, suggesting that inflation isn't currently a problem for the economy and Federal Reserve policy-makers can stick with a gradual approach to raising interest rates.	5.236367417985701
+
+Dollar Gains Vs Yen (Reuters) Reuters - The dollar rose to a five-week high\against the yen on Thursday as rising oil prices hurt Asian\currencies and the market decided that U.S. interest rates were\still on a rising path.	5.051452430511696
+
+Inflation fall eases rates pressure INFLATION fell again in August, slipping further below the governments 2 per cent target, driven down by clothing and footwear retailers failing to raise prices after a poor summer.	5.126769710036026
+
+Eurozone data to confirm slumping confidence, easing inflation BRUSSELS (AFP) - Eurozone figures due out this week will confirm that confidence is slumping due to high oil prices and the rise of the euro, and that inflation is easing, economists said.	5.173119934028652
+
+China Pledges to Move Toward Flexible Exchange Rate China says it will move toward a flexible exchange rate for its currency, but there is no word on how long such a transition will take.	5.053234825867042
+
+Dollar in Sight of All-Time Low Vs Euro (Reuters) Reuters - The dollar was in striking distance of\record lows against the euro and 7-    month lows versus the\yen on Thursday, as traders concluded that nations at an\upcoming G20 meeting would tolerate a weaker dollar.	4.977692133841975
+
+OECD tips US growth slowdown in 2005 US economic growth will slow to 3.3 per cent in 2005, more than a full percentage point below this year, with the effect of high energy prices dragging on the economy for the next few quarters, the OECD said on Tuesday.	5.02928954430705
+
+US August Inflation Mild, Job Claims Rise US consumer prices inched up just 0.1 percent last month as gasoline and car prices tumbled, the government said on Thursday in a report suggesting an inflation spike earlier this year was an aberration.	4.967395252313511
+
+China's inflation rate slows sharply but problems remain (AFP) AFP - China's inflation rate eased sharply in October as government efforts to cool the economy began to really bite, with food prices, one of the main culprits, showing some signs of slowing, official data showed.	5.407771944230818
+
+Producer Price Surge Fuels Inflation Fears Producer prices surged 1.7 percent in October, their sharpest monthly increase in nearly 15 years.	5.199759192052115
+
+####### Feature 10 ##########
+
+
+
+HP Hugs JBoss Tighter HP (Quote, Chart) deepened its relationship with open source software concern JBoss, agreeing to become a major source of support for its application server and Linux.	4.3501487769178935
+
+Vendors Upgrade Development Tools OCTOBER 18, 2004 (COMPUTERWORLD) - IBM and Borland Software Corp. last week separately brought out upgrades to their development tool lines that executives said add support for heterogeneous environments and 	4.392800915000345
+
+IBM launches top-end Power5 servers IBM has expanded the top end of its eServer range with three multiple-processor systems aimed at datacentres and large enterprise clients.	4.394199389728783
+
+IBM Claims Computing Crown (The Motley Fool) The Motley Fool - IBM (NYSE: IBM - News) has new bragging rights. Press reports indicate that the technology giant has created the world's fastest supercomputer two years after a Japanese computer claimed that title.	4.499118740461123
+
+Oracle launches Business Integlligence 10g Oracle introduced a new BI platform yesterday, Business Intelligence 10g that rolls up into one solution all of their BI tools. However, more interesting than the nitty-gritty details of what is included is the back story taking place at the same time.	4.304382654583941
+
+Intel executive: EM64T has set back Itanium SAN FRANCISCO -- Intel Corp.'s decision to begin shipping versions of x86 processors that are capable of 64-bit computing has slowed down the adoption of the company's high-end Itanium processors, a senior executive acknowledged Tuesday during a question and answer session at the Intel Developer Forum (IDF) in San Francisco.	4.394610321968237
+
+Dell upgrades high-performance cluster line To boost performance for high-end users, Dell Inc. is upgrading its high-performance computing clusters by adding support for larger Topspin InfiniBand switches and PCIe host channel adapters.	4.693376236442258
+
+Oracle 1Q Earnings Rise 16 Percent (AP) AP - Business software giant Oracle Corp. said Tuesday that first-quarter earnings rose 16 percent driven by new database license sales that rose 19 percent.	4.6552651176232835
+
+Big Blue veteran heads to EMC EMC has hired a former IBM veteran to be its chief technology officer, in what appears to be the latest step in EMC #39;s evolution from a data storage hardware specialist to a more comprehensive computing company.	4.402362172796202
+
+IBM Aims New DB2 at Rivals IBM (Quote, Chart) announced its first major database refresh in almost two years with new features from the company #39;s autonomic computing vault.	4.470124317685522
+
+####### Feature 15 ##########
+
+
+
+Russian Spacecraft Heads for International Space Station A Russian Soyuz spacecraft carrying two Russian cosmonauts and one American astronaut has reached orbit, after blasting off from the Baikonur cosmodrome in Kazakhstan.	7.039963810646618
+
+Modified US space shuttle ready to fly next spring NASA said Thursday it had corrected flaws that caused the destruction of the space shuttle Columbia in February 2003 and that a modified shuttle would be ready to resume flights sometime next Spring.	6.563026140995868
+
+New Crew Prepares for Launch to International Space Station All three men heading to the international space station in a Russian-built Soyuz spacecraft this Thursday will be riding the tiny craft for the first time, breaking with 35 years of tradition.	6.665166375327045
+
+NASA looking at May launch Citing technical challenges due to hurricanes, NASA officials said that the initial space shuttle mission for Return to Flight will slip from March to May 2005.	6.573129226517851
+
+Astronauts arrive at space station A RUSSIAN spacecraft has delivered three astronauts to the International Space Station, overcoming docking system problems which had delayed its launch.	6.8768677670522065
+
+Mission accomplished: US astronauts are home at last American astronaut Mike Fincke and Russian commander Gennady Padalka descended to Earth in remote Kazakstan late Saturday aboard a Soyuz space capsule.	6.546574794654109
+
+Nasa to resume shuttle missions The American space agency Nasa says the first space shuttle mission since the Columbia disaster of 2003 is to be launched next May or early June.	6.896691087264867
+
+Launcher eyes shuttle succession Boeing's huge Delta 4-Heavy rocket, set for lift-off on Saturday, may play a role in life after the space shuttle.	6.511824995057064
+
+Next space station crew to launch Expedition 10, the next crew to live on the International Space Station (ISS), is set to launch from Kazakhstan. US astronaut Leroy Chiao and Russian cosmonaut Salizhan Sharipov will leave the Baikonur Cosmodrome on a Soyuz rocket at 0306GMT on Thursday.	6.699216301289704
+
+NASA puts off space shuttle flights until at least May WASHINGTON: The US space agency NASA has put off resumption of space shuttle flights from March until at least May, the agency has said.	6.736309561286703
+
+####### Feature 19 ##########
+
+
+
+Dell cuts prices on many corporate products Dell on Monday said it had cut prices by as much as fifth for a range of products aimed at US corporate customers, as the computer maker passed along savings from cheaper components.	5.842687171760241
+
+Sprint, SBC Announce Wi-Fi Roaming Pact Customers of Sprint Corp. and SBC Communications Inc. will be able to use both companies' wireless Internet connections with less hassle under a reciprocal deal announced Friday.	5.7157025854199155
+
+August Chip Sales Growth Slows on High Inventory  SAN FRANCISCO (Reuters) - Global semiconductor sales growth  slowed to 1 percent in August as electronics makers reacted to  growing inventories in Asia by limiting orders of chips, an  industry trade group said on Thursday.	5.512103120366972
+
+SIA: Chip sales to hit record, flatten Worldwide semiconductor sales will hit an all-time high in 2004 but stay relatively flat in 2005 before climbing again over the next two years, according to the Semiconductor Industry Association.	5.572515301305735
+
+Korean and Japanese Phone Makers Win -Survey  AMSTERDAM (Reuters) - South Korean mobile phone makers  continued a rapid move up the global market rankings during the  third quarter, while growth in the wider mobile phone market  slowed, a survey found on Wednesday.	6.114141443905916
+
+Report: IBM's PC business up for sale IBM Corp. has put its PC business up for sale, according to a story published on Friday on the Web site of The New York Times.	5.807914227951321
+
+AOL Dumping Some Broadband unsupported writes  quot;Just days after news that AOL will be breaking up into 4 business units, AOL is telling existing broadband customers in 9 Southern states to find a new carrier.	5.650480031392487
+
+August chip sales up Global semiconductor sales rose 1.1 percent to \$18.2 billion in August from the previous month and it appears as though chip inventories are declining, an industry trade group said Thursday.	5.809987306016444
+
+Research Is Definitely in Motion The Blackberry wireless device maker is straining to exceed expectations.	5.51858590026171
+
+Global sales of mobile phones hit record levels PARIS Global cellphone sales rose to record levels in the second quarter as Nokia clawed back some of its lost market share, according to figures released Thursday.	6.222545976509478
