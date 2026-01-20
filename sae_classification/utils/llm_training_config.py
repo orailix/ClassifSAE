@@ -4,17 +4,22 @@ from loguru import logger
 from configparser import ConfigParser
 
 from .paths import *
-from .datasets_parameters import DICT_CATEGORIES
+from .datasets_parameters import DICT_CATEGORIES, DICT_DATASET_ALIAS
 
 
 class LLMTrainerConfig:
     """
-    Configuration for tuning an autoregressive LLM backbone on a text classification dataset with template.
+    Configuration for fine-tuning an  LLM backbone on a text classification dataset.
+    If the LLM has a decoder-only architecture, we use a template to specify the possible labels to choose from.
     
     Args:
         model_name (str)
         model_path (str)
         dataset_name (str)
+        imbalanced_classes (bool) : True if want to take to into account that categories are imbalanced in the dataset for the classification fine-tuning 
+        quantized (bool) : Load the the model weights in 8-bit
+
+        eos (bool) : does the model adds end of sentence token
         
         training_args (to use directly in TrainingArguments and pass this to the transformer Trainer)
     
@@ -22,10 +27,13 @@ class LLMTrainerConfig:
     
     model_name: str = "pythia_14m"
     dataset_name: str = "imdb"
+    quantized: bool = False 
+    imbalanced_classes: bool = False
+
     training_args: dict = {}
 
     # Does the tokenizer add an end-of-sentence token after processing the sentence ?
-    eos: bool = True
+    eos: bool = False
 
     model_path: str 
     model_path_pre_trained: str
@@ -39,6 +47,8 @@ class LLMTrainerConfig:
                  model_path: str,
                  dataset_name: str,
                  eos: bool,
+                 imbalanced_classes: bool,
+                 quantized: bool,
                  training_args: dict):
 
         ############### MODEL Loading ########################
@@ -47,6 +57,7 @@ class LLMTrainerConfig:
         self.model_name = model_name
         self.model_path = model_path
         self.model_path_pre_trained = model_path
+        self.quantized = quantized
         
         #################### DATASET Loading ###################################
 
@@ -57,20 +68,18 @@ class LLMTrainerConfig:
         
         
         self.dataset_name = dataset_name
-            
+        self.imbalanced_classes = imbalanced_classes
+
         self.dataset_path = os.path.join(PATH_LOCAL_DATASET, dataset_name)
         self.dataset_in_local = os.path.exists(self.dataset_path) and os.path.isdir(self.dataset_path)
-        # if (not dataset_in_local) :
-        #     raise ValueError(f"The dataset name provided is not present in {PATH_LOCAL_DATASET}. Datasets saved locally are {os.listdir(PATH_LOCAL_DATASET)}")
+        self.official_name_repo = DICT_DATASET_ALIAS[self.dataset_name]
+        
             
         ################### TOKENIZER Loading #############################
         
-        self.tokenizer_path = model_path
+        self.tokenizer_path = self.model_path_pre_trained
         self.eos = eos
 
-        # We have not implemented extraction of concepts for models in few shot learning yet
-        self.add_example = False
-        self.example = []
         
         #If no training_args provided, we go for the defaults
         self.training_args = dict(
@@ -83,14 +92,16 @@ class LLMTrainerConfig:
                 per_device_train_batch_size=4,
                 per_device_eval_batch_size=4,
                 num_train_epochs=1,
-                max_steps=7000,  # Train for only 7000 steps (batches)
+                max_steps=7000,  
                 weight_decay=0.01,
                 save_strategy = "steps",
                 save_steps=5000,
                 report_to="wandb",
                 run_name=f'fine_tune_{dataset_name}',
-                logging_steps=200,
-            
+                logging_strategy="steps",
+                logging_steps=50,
+                seed=42,
+                data_seed=42
             )
         
         for key, value in training_args.items():
@@ -155,7 +166,7 @@ class LLMTrainerConfig:
             return cls.from_config_file(PATH_CONFIG / f"{name}.cfg")
         
         else: 
-            raise TypeError("The config file for the LLM classifier tuning is not found")
+            raise TypeError("The config file for the LLM classifier fine-tuning is not found")
         
         
     @classmethod
@@ -186,8 +197,18 @@ class LLMTrainerConfig:
             eos = True
         else:
             eos = (parser["main"]["model"].lower()=='true')
-       
-          
+
+        if "imbalanced_classes" not in parser["main"]:
+            imbalanced_classes = False
+        else:
+            imbalanced_classes = (parser["main"]["imbalanced_classes"].lower()=='true')
+
+        if "quantized" not in parser["main"]:
+            quantized=False
+        else:
+            quantized=(parser["main"]["quantized"].lower()=='true')
+
+             
         model_name = parser["main"]["model"]
         model_path = parser["main"]["model_path"]
         dataset_name = parser["main"]["dataset"]
@@ -205,5 +226,7 @@ class LLMTrainerConfig:
             model_path=model_path,
             dataset_name=dataset_name,
             eos=eos,
-            training_args=training_args,
+            imbalanced_classes=imbalanced_classes,
+            quantized=quantized,
+            training_args=training_args
         )

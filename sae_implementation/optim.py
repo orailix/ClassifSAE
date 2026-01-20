@@ -1,7 +1,7 @@
 # =============================================================================
 # This file is directly the copy from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/training/optim.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 # 
 # The LR scheduler comes from  https://github.com/jbloomAus/DecisionTransformerInterpretability/blob/ee55df35cdb92e81d689c72fb9dd5a7252893363/src/decision_transformer/utils.py#L425
 #

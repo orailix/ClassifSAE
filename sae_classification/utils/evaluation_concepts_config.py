@@ -28,8 +28,6 @@ class EvaluationConceptsConfig:
         
         Specific arguments for SAE : 
 
-            sae_name (str) : Name of the trained SAE
-
             checkpoint_version (int)  : Version of the SAE i.e. number of tokens seen during the training (counting duplicate)
             
             latest_version (bool) : If specified, it overrides 'checkpoint_version' and automatically assigned the SAE version with the highest number of training tokens
@@ -52,7 +50,6 @@ class EvaluationConceptsConfig:
                  hook_layer: int = 4,
                  model_name:str = "",
                  dataset_name:str = "",
-                 sae_name: str = "",  #Specifc parameter for SAE
                  checkpoint_version: int = 5000,  #Specifc parameter for SAE
                  latest_version: bool = True,  #Specifc parameter for SAE
                  causality: bool = False,
@@ -66,7 +63,7 @@ class EvaluationConceptsConfig:
 
         ######## Method Loading ###############
 
-        supported_approaches = ["ica","concept_shap","sae"]
+        supported_approaches = ["ica","concept_shap","sae","hi_concept"]
         assert method_name in supported_approaches, f"Error: The method {method_name} is not supported in evaluation. Currently the only supported methods are {supported_approaches}"
 
         # Path where to save reconstruction metrics 
@@ -78,7 +75,7 @@ class EvaluationConceptsConfig:
         # Store original and concepts activations from the inference on test dataset for potential further analysis
         self.activations_interpretability_methods_post_analysis = os.path.join(PATH_POST_ANALYSIS_ACTIVATIONS)
 
-        if method_name in ["ica","concept_shap"]:
+        if method_name in ["ica","concept_shap","hi_concept"]:
 
                 
             self.path_to_baseline_methods = os.path.join(PATH_BASELINE_METHODS, f'{method_name}_{model_name}_{dataset_name}_layer_{hook_layer}')
@@ -115,6 +112,13 @@ class EvaluationConceptsConfig:
                 thres=0.1,
                 device = device,
             )
+        elif method_name == 'hi_concept':
+            self.methods_args = dict(
+                n_concepts=10,
+                hidden_dim=512,
+                thres=0.1,
+                device = device,
+            )
         elif method_name == 'sae':
             '''
             The hidden layer of the SAE may be larger than the number of concepts we imposed to extract. 
@@ -127,7 +131,7 @@ class EvaluationConceptsConfig:
             '''
             self.methods_args = dict(
                 features_selection = 'truncation',  
-                n_concepts = 80,
+                n_concepts = 10,
                 d_sae = 1536,
                 feature_activation_rate=0.05,
                 supervised_classification=True,
@@ -136,7 +140,8 @@ class EvaluationConceptsConfig:
         
         elif method_name == 'ica':
             self.methods_args = dict(
-                device='cpu'
+                device=device,
+                n_concepts = 10
             )
 
 
@@ -235,11 +240,6 @@ class EvaluationConceptsConfig:
         else:
             hook_layer = int(parser["main"]["hook_layer"])
 
-        if "sae" not in parser["main"]:
-            sae_name = ""
-        else:
-            sae_name = parser["main"]["sae"]
-
         if "model" not in parser["main"]:
               model_name = ""
         else:    
@@ -287,7 +287,6 @@ class EvaluationConceptsConfig:
             hook_layer=hook_layer,
             model_name=model_name,
             dataset_name=dataset_name,
-            sae_name=sae_name,
             checkpoint_version=checkpoint_version,
             latest_version=latest_version,
             causality=causality,

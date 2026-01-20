@@ -1,12 +1,12 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/sae.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 # The original code was itself copied and simplified from https://github.com/jbloomAus/SAELens/tree/main.
 #
 # NOTES:
-#   • The main modification involves adding the joint classifier head to the SAE architecture (SAE class). 
+#   • The main modification involves adding the joint classifier head to the SAE architecture for ClassifSAE. 
 #     The latter is trained in `training_sae.py` to imitate the investigated LLM classifier's predictions on the training dataset with inputs z_class.
 # =============================================================================
 
@@ -19,8 +19,6 @@ from typing import Any, Callable, Literal, Optional, Tuple, TypeVar, Union, over
 
 T = TypeVar("T", bound="SAE")
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
 from jaxtyping import Float
 from safetensors.torch import save_file
 from torch import nn
@@ -68,8 +66,6 @@ class SAEConfig:
 
     @classmethod
     def from_dict(cls, config_dict: dict[str, Any]) -> "SAEConfig":
-
-        print(config_dict)
         
         # rename dict:
         rename_dict = {  # old : new
@@ -162,7 +158,7 @@ class SAE(HookedRootModule):
                 x = x * self.x_norm_coeff
                 return x
 
-            def run_time_activation_norm_fn_out(x: torch.Tensor) -> torch.Tensor:  #
+            def run_time_activation_norm_fn_out(x: torch.Tensor) -> torch.Tensor:  
                 x = x / self.x_norm_coeff
                 del self.x_norm_coeff  # prevents reusing
                 return x
@@ -238,6 +234,8 @@ class SAE(HookedRootModule):
             torch.zeros(self.cfg.nb_classes, dtype=self.dtype, device=self.device)
         )
 
+
+
        
 
     def initialize_weights_gated(self):
@@ -287,6 +285,7 @@ class SAE(HookedRootModule):
         self.classifier_bias = nn.Parameter(
             torch.zeros(self.cfg.nb_classes, dtype=self.dtype, device=self.device)
         )
+
 
     @overload
     def to(
@@ -457,9 +456,16 @@ class SAE(HookedRootModule):
         # will fail if you call this twice without calling encode in between.
         sae_out = self.run_time_activation_norm_fn_out(sae_out)
 
-       
-
         return sae_out
+    
+    def classify(self, z: torch.Tensor) -> torch.Tensor:
+        """
+        Compute classifier logits from feature vector(s) z with shape (..., num_classifier_features).
+        """
+        
+        z_class = z[:,:self.cfg.num_classifier_features]
+        
+        return z_class @ self.classifier_weight.T + self.classifier_bias
 
     @torch.no_grad()
     def fold_W_dec_norm(self):
@@ -487,20 +493,20 @@ class SAE(HookedRootModule):
     def save_model(self, path: str, sparsity: Optional[torch.Tensor] = None):
 
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path, exist_ok=True)
 
         # generate the weights
-        save_file(self.state_dict(), f"{path}/{SAE_WEIGHTS_PATH}")
+        save_file(self.state_dict(), os.path.join(path, SAE_WEIGHTS_PATH))
 
         # save the config
         config = self.cfg.to_dict()
 
-        with open(f"{path}/{SAE_CFG_PATH}", "w") as f:
+        with open(os.path.join(path, SAE_CFG_PATH), "w") as f:
             json.dump(config, f)
 
         if sparsity is not None:
             sparsity_in_dict = {"sparsity": sparsity}
-            save_file(sparsity_in_dict, f"{path}/{SPARSITY_PATH}")  # type: ignore
+            save_file(sparsity_in_dict, os.path.join(path, SPARSITY_PATH))  
 
     @classmethod
     def load_from_pretrained(
@@ -544,9 +550,8 @@ class SAE(HookedRootModule):
 
         Args:
             release: The release name. This will be mapped to a huggingface repo id based on the pretrained_saes.yaml file.
-            id: The id of the SAE to load. This will be mapped to a path in the huggingface repo.
+            sae_id: The id of the SAE to load. This will be mapped to a path in the huggingface repo.
             device: The device to load the SAE on.
-            return_sparsity_if_present: If True, will return the log sparsity tensor if it is present in the model directory in the Hugging Face model hub.
         """
 
         # get sae directory
@@ -618,6 +623,7 @@ class TopK(nn.Module):
         result = torch.zeros_like(x)
         result.scatter_(-1, topk.indices, values)
         return result
+
 
 
 def get_activation_fn(

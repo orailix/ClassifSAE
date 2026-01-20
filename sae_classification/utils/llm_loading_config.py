@@ -7,7 +7,7 @@ import ast
 import re
 
 from .paths import *
-from .datasets_parameters import DICT_CATEGORIES, DICT_TEMPLATE_LEN
+from .datasets_parameters import DICT_CATEGORIES, DICT_DATASET_ALIAS
 
 class LLMLoadConfig:
     """
@@ -18,7 +18,9 @@ class LLMLoadConfig:
         model_name (str)
         model_path (str) : Usually the path used to retrieve the pre-trained model on HuugingFace. This the path used by default if the finetuned option is deactivated, it is also used by HookedTransformer to ensure that the architecture is handled by transformer_lens
         dataset_name (str) : either dataset for caching or evaluation
-        
+        quantized (bool) : Load the the model weights in 8-bit
+        prompt_tuning (bool) : Will the forward passes on the LLM require doing prompt fine-tuning ?
+
         finetuned (bool) : Whether the model is to be searched in the directory of finetuned models, otherwise it is considered as a pre-trained model
         
         (Only considered if 'finetuned'=True)
@@ -64,7 +66,11 @@ class LLMLoadConfig:
                 model_path: str,
                 dataset_name: str,
                 split: str,
+                quantized: bool,
                 finetuned: bool,
+                prompt_tuning: bool,
+                vtok: int,
+                prompt_tuning_total_steps: int,
                 dataset_tuned_on: str,
                 checkpoint_version: int = 5000,
                 latest_version: bool = True,
@@ -79,7 +85,8 @@ class LLMLoadConfig:
 
         self.model_path_pre_trained = model_path
         self.model_architecture = model_path
-        
+        self.quantized = quantized
+
         if finetuned:
             load_dir = os.path.join(PATH_CHECKPOINTS, f"{model_name}/{dataset_tuned_on}")
             ## The different versions of the tuned model are saved in folders named 'checkpoint-X'
@@ -117,7 +124,22 @@ class LLMLoadConfig:
             self.model_name = model_name
             self.model_path = model_path
             
+        # Will the forward passes on the LLM require doing prompt fine-tuning ?
+        self.prompt_tuning  = prompt_tuning
+        self.prompt_embeddings_dir = PATH_PROMPT_EMBEDDINGS
 
+        if vtok==-1:
+            vtok=10
+
+        if prompt_tuning_total_steps==-1:
+            prompt_tuning_total_steps=2000
+
+        self.prompt_tuning_params = {'vtok': vtok, 'total_steps':prompt_tuning_total_steps}
+
+        if self.prompt_tuning:
+            self.prompt_embeddings_path = os.path.join(self.prompt_embeddings_dir,model_name,dataset_name,f"embeddings_prompt_{self.prompt_tuning_params['vtok']}_{self.prompt_tuning_params['total_steps']}.pt")
+        else:
+            self.prompt_embeddings_path=None
 
         #################### DATASET Loading ###################################
 
@@ -130,38 +152,32 @@ class LLMLoadConfig:
         self.dataset_path = os.path.join(PATH_LOCAL_DATASET, dataset_name)
         
         self.dataset_in_local = os.path.exists(self.dataset_path) and os.path.isdir(self.dataset_path)
-        # if (not dataset_is_present) :
-        #     raise ValueError(f"The dataset name provided is neither present in {PATH_LOCAL_DATASET}. Datasets saved locally are {os.listdir(PATH_LOCAL_DATASET)}")
+        self.official_name_repo = DICT_DATASET_ALIAS[self.dataset_name]
     
         
         ################### TOKENIZER Loading #############################
 
     
-        self.tokenizer_path = self.model_path
-        self.len_template = DICT_TEMPLATE_LEN[self.dataset_name]
+        self.tokenizer_path = self.model_path_pre_trained
         self.split = split
 
-        # We have not implemented extraction of concepts for models in few shot learning yet
-        self.add_example = False
-        self.example = []
 
         self.dir_to_save_metrics = os.path.join(PATH_MODEL_METRICS,self.model_name)
 
         # If no task_args provided, we go for the defaults given the specified task
         if task=="evaluation":
             self.task_args = dict(
-                    eos=True,
-                    batch_size=4,
+                    eos=False,
+                    batch_size=1,
                     proportion_to_evaluate=1.
                 )
         if task=="sae_training":
             
-            if torch.backends.mps.is_available(): #Apple
+            if torch.backends.mps.is_available():
                 device = "mps"
             else:
                 device = "cuda" if torch.cuda.is_available() else "cpu"
             
-
             total_training_steps = 10 
             batch_size = 40
             training_tokens = total_training_steps * batch_size
@@ -196,7 +212,7 @@ class LLMLoadConfig:
                 lr_decay_steps=total_training_steps // 5,  # this will help us avoid overfitting.
                 l1_coefficient=5, 
                 lmbda_mse=1, # weight on the reconstruction loss of the hidden state in the training objective
-                lmbda_feature_sparsity=0.0, # weight on the activation rate loss (sparsity of the feature activation over the batch) in the training objective
+                lmbda_activation_rate=0.0, # weight on the activation rate loss (sparsity of the feature activation over the batch) in the training objective
                 lmbda_vcr=0.0, # weight on the vcr loss in the training objective
                 lmbda_decoder_columns_similarity=0.0, # weight on the decoder columns similarity loss in the training objective
                 lmbda_classifier=0.0, # weight on the classifier loss in the training objective 
@@ -237,6 +253,7 @@ class LLMLoadConfig:
                training_tokens = 400,
                eos=False,
                prompt_tuning=False,
+               prompt_embeddings_path=self.prompt_embeddings_path,
                save_label=False,
                #buffer details
                n_batches_in_buffer=4,
@@ -287,7 +304,7 @@ class LLMLoadConfig:
         elif task=="sae_training":
             directory_label = "with_labels" if self.task_args['save_label'] else "without_labels"
             self.task_args['hook_name'] =  f"blocks.{self.task_args['hook_layer']}.hook_resid_pre" # We always branch at the residual stream entering the specified layer l. It means that it also corresponds to the residual stream exiting the (l-1)-th layer.
-            self.task_args["wandb_project"] = f"sae_training_{self.model_name}_{self.dataset_name}_{self.task_args['hook_name']}_V3"
+            self.task_args["wandb_project"] = f"sae_{self.model_name}_{self.dataset_name}_{self.task_args['hook_name']}"
             self.task_args["wandb_id"] = f"sae_{self.model_name}_{self.dataset_name}_{self.task_args['hook_name']}"
             
             #In case if there are multiple possibilities in the cache activation directories, we go for the one that has the most stored activations
@@ -363,9 +380,12 @@ class LLMLoadConfig:
             split="train"
         else:
             split=parser["main"]["split"]
-      
+        if "quantized" not in parser["main"]:
+            quantized=False
+        else:
+            quantized=(parser["main"]["quantized"].lower()=='true')
+
         
-            
         model_name = parser["main"]["model"]
         model_path = parser["main"]["model_path"]
         
@@ -377,7 +397,6 @@ class LLMLoadConfig:
         
         if "version" in parser:
             if "finetuned" in parser["version"]:
-                logger.info(f"Finetuned model is chosen")
                 finetuned = (parser["version"]["finetuned"].lower() == 'true')
             else:
                 finetuned=True
@@ -394,7 +413,23 @@ class LLMLoadConfig:
             else:
                 dataset_tuned_on = dataset_name
 
+        vtok=-1
+        prompt_tuning_total_steps = -1
+
+        # In case we do prompt-tuning
+        if "prompt_tuning" in parser:
+            prompt_tuning = True
+            if "vtok" in parser["prompt_tuning"]:
+                vtok = int(parser["prompt_tuning"]["vtok"])
+            
+            if "total_steps" in parser["prompt_tuning"]:
+                prompt_tuning_total_steps = int(parser["prompt_tuning"]["total_steps"])
+                
+
+        else:
+            prompt_tuning=False
         
+
         if "task_args" in parser:
             task_args = parser["task_args"]
         else:
@@ -408,6 +443,10 @@ class LLMLoadConfig:
             model_path=model_path,
             dataset_name=dataset_name,
             split=split,
+            quantized=quantized,
+            prompt_tuning=prompt_tuning,
+            vtok=vtok,
+            prompt_tuning_total_steps=prompt_tuning_total_steps,
             finetuned=finetuned,
             dataset_tuned_on=dataset_tuned_on,
             checkpoint_version=checkpoint_version,

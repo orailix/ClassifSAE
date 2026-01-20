@@ -7,10 +7,10 @@ from .paths import *
 
 class BaselineMethodConfig:
     """
-    Configuration for training baseline concepts discovery methods : ConceptSHAP and ICA. 
+    Configuration for training baseline concepts discovery methods : ConceptSHAP, ICA and HIConcept. 
     
     Args:
-        method_name (str) : name of the method. So far, concept_shap or ica 
+        method_name (str) : name of the method. So far, concept_shap, ica or hi_concept 
 
         hook_layer (int) : depth at which the activations extraction is resolved
 
@@ -40,7 +40,7 @@ class BaselineMethodConfig:
         self.hook_name = f"blocks.{hook_layer}.hook_resid_pre"
         self.hook_layer = hook_layer
 
-        supported_approaches = ["ica","concept_shap"]
+        supported_approaches = ["ica","concept_shap", "hi_concept"]
         assert method_name in supported_approaches, f"Error: The method {method_name} is not supported in the benchmarks. Currently the only supported methods are {supported_approaches}"
         
         ######## Method Loading ###############
@@ -97,9 +97,8 @@ class BaselineMethodConfig:
             )
         elif method_name == 'concept_shap':
            self.baseline_method_args = dict(
-                l1 = 0.001,
-                l2 = 0.001,
-                topk = 10,
+                r1 = 0.001,
+                r2 = 0.001,
                 batch_size=32,
                 epochs=3,
                 loss_reg_epoch=2,
@@ -109,8 +108,23 @@ class BaselineMethodConfig:
                 nb_classes=4,
                 seed=42
             ) 
+        elif method_name == 'hi_concept':
+           self.baseline_method_args = dict(
+                r1 = 0.1,
+                r2 = 0.5,
+                ae_loss_reg=1,
+                pred_loss_reg=1,
+                flip_loss_reg=1,
+                batch_size=32,
+                epochs=3,
+                loss_reg_epoch=0,
+                n_concepts=10,
+                hidden_dim=512,
+                nb_classes=4,
+                seed=42
+            ) 
         else:
-            raise ValueError(f"The only supported baseline methods so far are ICA and ConceptSHAP")
+            raise ValueError(f"The only supported baseline methods so far are ICA, ConceptSHAP and HIConcept")
         
         for key, value in baseline_method_args.items():
             if not isinstance(key, str):
@@ -179,7 +193,7 @@ class BaselineMethodConfig:
             return cls.from_config_file(PATH_CONFIG / f"{name}.cfg")
         
         else: 
-            raise TypeError("The config file for BaselineMethodConfig is not found")
+            raise TypeError(f"The config file {name} for BaselineMethodConfig is not found")
         
         
     @classmethod

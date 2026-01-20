@@ -2,7 +2,14 @@ from typing import Optional
 import typer
 from loguru import logger
 from .llm_classifier_tuning import fine_tuning_model, main_evaluation
-from .concepts_extraction import activation_caching, sae_trainer, baseline_concept_method_train, selection_segmentation_concepts, concepts_evaluation, concept_interpretability
+from .concepts_extraction import (
+        cache_activations, 
+        sae_trainer, 
+        baseline_concept_method_train, 
+        selection_segmentation_concepts,
+        concepts_evaluation,
+        concept_interpretability)
+
 
 app = typer.Typer()
 
@@ -25,13 +32,15 @@ def eval_classifier(config: Optional[str] = None):
 def save_activations_classifier(config: Optional[str] = None):
     if config is None:
         raise ValueError(f"You should pass a config with the --config option.")
-    activation_caching(config)
+    cache_activations(config)
+
 
 @app.command()
 def train_sae(config: Optional[str] = None):
     if config is None:
         raise ValueError(f"You should pass a config with the --config option.")
     sae_trainer(config)
+
 
 @app.command()
 def train_baseline(config_baseline: Optional[str] = None,
@@ -42,6 +51,7 @@ def train_baseline(config_baseline: Optional[str] = None,
 
 
     baseline_concept_method_train(config_baseline,config_model)
+
 
 @app.command()
 def post_process_concepts(config_concept: Optional[str] = None,
@@ -70,7 +80,6 @@ def evaluate_concepts(config_concept: Optional[str] = None,
     
     concepts_evaluation(config_concept, config_classifier)
 
-
 @app.command()
 def interpret_concepts(config_concept: Optional[str] = None,
                        config_classifier: Optional[str] = None):
@@ -83,6 +92,7 @@ def interpret_concepts(config_concept: Optional[str] = None,
 
     
     concept_interpretability(config_concept, config_classifier)
+
 
 if __name__ == "__main__":
     app()

@@ -1,11 +1,11 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/config.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 #
 # NOTES:
-#   • We typically added the declaration of all options specific to our ClassifSAE settings in addition of the already implemented SAE options (notably eos,save_label, len_epoch, lmbda_mse, lmbda_feature_sparsity, lmbda_classifier, num_classifier_features, nb_classes, feature_activation_rate)
+#   • We typically added the declaration of all options specific to our ClassifSAE settings in addition of the already implemented SAE options (notably eos,save_label, len_epoch, lmbda_mse, lmbda_activation_rate, lmbda_classifier, num_classifier_features, nb_classes, feature_activation_rate)
 #
 # =============================================================================
 
@@ -16,7 +16,7 @@ from typing import Any, Literal, Optional, cast
 
 import torch
 import wandb
-from datasets import Dataset, DatasetDict, IterableDataset, IterableDatasetDict
+from datasets import Dataset, DatasetDict
 
 
 DTYPE_MAP = {
@@ -30,7 +30,7 @@ DTYPE_MAP = {
     "torch.bfloat16": torch.bfloat16,
 }
 
-HfDataset = DatasetDict | Dataset | IterableDatasetDict | IterableDataset
+HfDataset = DatasetDict | Dataset 
 
 def _default_cached_activations_path(
     dataset_path: str,
@@ -51,7 +51,7 @@ class CacheActivationsRunnerConfig:
     Configuration for caching activations of an LLM.
     """
 
-    # Data Generating Function (Model + Training Distibuion)
+    # Data Generating Function (Model + Training distribution)
     model_class_name: str = "HookedTransformer"
     hook_name: str = "blocks.{layer}.hook_resid_pre"
     hook_layer: int = 0
@@ -60,6 +60,11 @@ class CacheActivationsRunnerConfig:
         None 
     )
     cached_activations_path: Optional[str] = None
+
+    prompt_embeddings_path: Optional[str] = (
+        None 
+    )
+
     # Dimension of the residual stream of the investigated LLM classifier
     d_in: int = 512
 
@@ -147,6 +152,7 @@ class LanguageModelSAERunnerConfig:
         
         eos : bool - Whether the tokenized sentence contains an end of sequence token. To know where to locate the token containing the class prediction
         prompt_tuning : bool
+        prompt_embeddings_path: Optional[str] - Path to load prompt embeddings to add to the investigated sentences in order to enable good classification accuracy of models without fine-tuning
         save_label bool - Whether we also cache the labels, in that case the labels are concatenated to the embedding vector
         len_epoch : int - The number of training steps that can be considered as one epoch
         
@@ -175,7 +181,7 @@ class LanguageModelSAERunnerConfig:
         
         use_ghost_grads (bool): Whether to use ghost gradients.
         lmbda_mse (float) : weight on the mse loss of the hidden state reconstruction in the training objective
-        lmbda_feature_sparsity (float): weight on the feature sparsity loss in the training objective
+        lmbda_activation_rate (float): weight on the features activation rate sparsity loss in the training objective
         lmbda_vcr (float): weight on the vcr loss in the training objective
         lmbda_decoder_columns_similarity (float) : weight on the decoder columns similarity loss in the training objective
         lmbda_classifier (float): weight on the classifier loss in the training objective 
@@ -203,7 +209,7 @@ class LanguageModelSAERunnerConfig:
         
     """
 
-    # Data Generating Function (Model + Training Distibuion)
+    # Data Generating Function (Model + Training distribution)
     model_class_name: str = "HookedTransformer"
     hook_name: str = "blocks.0.hook_resid_pre"
     hook_layer: int = 0
@@ -212,6 +218,11 @@ class LanguageModelSAERunnerConfig:
     cached_activations_path: Optional[str] = (
         None  # Defaults to "activations/{dataset}/{model}/{full_hook_name}_{hook_head_index}"
     )
+
+    prompt_embeddings_path: Optional[str] = (
+        None 
+    )
+
 
     # SAE Parameters
     architecture: Literal["standard", "gated"] = "standard"
@@ -275,7 +286,7 @@ class LanguageModelSAERunnerConfig:
     scale_sparsity_penalty_by_decoder_norm: bool = False
     l1_warm_up_steps: int = 0
     lmbda_mse: float = 1.0
-    lmbda_feature_sparsity: float = 0.0
+    lmbda_activation_rate: float = 0.0
     lmbda_vcr: float = 0.0
     lmbda_decoder_columns_similarity: float = 0.0
     lmbda_classifier: float = 0.0
@@ -301,9 +312,8 @@ class LanguageModelSAERunnerConfig:
 
     dead_feature_threshold: float = 1e-8
 
-    # We only retrieve the hidden state of one token per sentence, the token preceding the class-generating token
-    # The decoder-only LLM serves as a classifier in outputing its anwser via a single label token. 
-    context_size = 1  
+    # We only retrieve the hidden state of one token per sentence, the sentence-level hidden-state, containing the necessary information to classify the sentence
+    context_size: int = 1  
 
     # WANDB
     log_to_wandb: bool = True
@@ -324,6 +334,27 @@ class LanguageModelSAERunnerConfig:
 
     def __post_init__(self):
 
+        # Basic sanity checks
+        if self.train_batch_size_tokens <= 0:
+            raise ValueError("train_batch_size_tokens must be > 0")
+        
+        # Ensure d_sae is defined if expansion_factor == 0
+        if getattr(self, "d_sae", None) is None and self.expansion_factor == 0:
+            raise ValueError("Either set d_sae or a non-zero expansion_factor")
+        
+        # Compute d_sae / expansion_factor relationship
+        if self.expansion_factor != 0:
+            self.d_sae = self.d_in * self.expansion_factor
+        else:
+            self.expansion_factor = self.d_sae / self.d_in
+
+        # Classifier head dimensionality sanity check
+        if self.num_classifier_features > int(self.d_sae):
+            raise ValueError(
+                f"num_classifier_features ({self.num_classifier_features}) must be <= d_sae ({self.d_sae})"
+            )
+
+    
         if self.use_cached_activations and self.cached_activations_path is None:
             self.cached_activations_path = _default_cached_activations_path(
                 self.dataset_path,
@@ -332,14 +363,6 @@ class LanguageModelSAERunnerConfig:
                 self.hook_head_index,
             )
 
-        if self.expansion_factor != 0:
-            self.d_sae = self.d_in * self.expansion_factor
-        else:
-            self.expansion_factor = self.d_sae / self.d_in
-
-        print(f"self.d_sae : {self.d_sae}")
-        print(f"self.expansion_factor : {self.expansion_factor}")
-        
         self.tokens_per_buffer = (
             self.train_batch_size_tokens * self.context_size * self.n_batches_in_buffer
         )
@@ -463,7 +486,7 @@ class LanguageModelSAERunnerConfig:
             "lp_norm": self.lp_norm,
             "use_ghost_grads": self.use_ghost_grads,
             "lmbda_mse": self.lmbda_mse,
-            "lmbda_feature_sparsity": self.lmbda_feature_sparsity,
+            "lmbda_activation_rate": self.lmbda_activation_rate,
             "lmbda_vcr": self.lmbda_vcr,
             "lmbda_decoder_columns_similarity": self.lmbda_decoder_columns_similarity,
             "lmbda_classifier": self.lmbda_classifier,

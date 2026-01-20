@@ -1,11 +1,11 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/cache_activations_runner.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 #
 # NOTES:
-#   •  This file has only minor modifications compared to the original code — we simply adapted the information to handle a single embedding per sentence.
+#   •  This file has only minor modifications compared to the original code — it was adapted to handle a single embedding per sentence.
 #
 # =============================================================================
 
@@ -17,9 +17,10 @@ from typing import Tuple
 import torch
 from tqdm import tqdm
 from transformer_lens import HookedTransformer
+
 from .config import DTYPE_MAP, CacheActivationsRunnerConfig
 from .activations_store import ActivationsStore
-
+from loguru import logger
 
 class SentenceCacheActivationsRunner:
     
@@ -40,31 +41,27 @@ class SentenceCacheActivationsRunner:
 
     def __str__(self):
         """
-        Print the number of tokens to be cached.
+        Print the number of items (token sentences) to be cached.
         Print the number of buffers, and the number of tokens per buffer.
         Print the disk space required to store the activations.
 
         """
-
-        bytes_per_token = (
-            self.cfg.d_in * self.cfg.dtype.itemsize
-            if isinstance(self.cfg.dtype, torch.dtype)
-            else DTYPE_MAP[self.cfg.dtype].itemsize
-        )
-        tokens_in_buffer = (
-            self.cfg.n_batches_in_buffer
-            * self.cfg.store_batch_size_prompts
-        )
-        total_training_tokens = self.cfg.training_tokens
-        total_disk_space_gb = tokens_in_buffer * math.ceil(total_training_tokens / tokens_in_buffer) * bytes_per_token / 10**9
-
-
+        # One activation per sentence; if save_label is True, we store d_in + 1 per item
+        width = self.cfg.d_in + (1 if getattr(self.cfg, "save_label", False) else 0)
+        dtype = self.cfg.dtype if isinstance(self.cfg.dtype, torch.dtype) else DTYPE_MAP[self.cfg.dtype]
+        bytes_per_item = width * dtype.itemsize
+        
+        items_per_buffer = self.cfg.n_batches_in_buffer * self.cfg.store_batch_size_prompts
+        total_items = self.cfg.training_tokens
+        total_buffers = math.ceil(total_items / items_per_buffer)
+        total_disk_space_gb = (items_per_buffer * total_buffers * bytes_per_item) / 1e9
+    
         return (
             f"Activation Cache Runner:\n"
-            f"Total training tokens: {total_training_tokens}\n"
-            f"Number of buffers: {math.ceil(total_training_tokens / tokens_in_buffer)}\n"
-            f"Tokens per buffer: {tokens_in_buffer}\n"
-            f"Disk space required: {total_disk_space_gb:.4f} GB\n"
+            f"Total training tokens: {total_items}\n"
+            f"Number of buffers: {total_buffers}\n"
+            f"Tokens per buffer: {items_per_buffer}\n"
+            f"Estimated disk space: {total_disk_space_gb:.4f} GB\n"
             f"Configuration:\n"
             f"{self.cfg}"
         )
@@ -83,16 +80,15 @@ class SentenceCacheActivationsRunner:
                 )
         else:
             os.makedirs(new_cached_activations_path)
+            
+        logger.info("Started caching {} activations", self.cfg.training_tokens)
 
-        print(f"Started caching {self.cfg.training_tokens} activations")
-        # We cache as many tokens as the number of sentences in the provided dataset
-        tokens_per_buffer = (
-            self.cfg.store_batch_size_prompts
-            * self.cfg.n_batches_in_buffer
-        )
+        # One activation per sentence; buffer size in items
+        items_per_buffer = self.cfg.store_batch_size_prompts * self.cfg.n_batches_in_buffer
+        n_buffers = math.ceil(self.cfg.training_tokens / items_per_buffer)
+        
 
-        n_buffers = math.ceil(self.cfg.training_tokens / tokens_per_buffer)
-
+        produced = 0
         for i in tqdm(range(n_buffers), desc="Caching activations"):
             try:
                 buffer = self.activations_store.get_buffer(self.cfg.n_batches_in_buffer)
@@ -100,33 +96,39 @@ class SentenceCacheActivationsRunner:
                 self.activations_store.save_buffer(
                     buffer, f"{new_cached_activations_path}/{i}.safetensors"
                 )
-
                 del buffer
+                produced += 1
 
+                # Shuffle periodically; include the buffer we just wrote (range upper bound is exclusive)
                 if i % self.cfg.shuffle_every_n_buffers == 0 and i > 0:
-                    # Shuffle the buffers on disk
+                    
+                    start = max(0, (i + 1) - self.cfg.shuffle_every_n_buffers)
+                    end = i + 1
 
                     # Do random pairwise shuffling between the last shuffle_every_n_buffers buffers
                     for _ in range(self.cfg.n_shuffles_with_last_section):
                         self.shuffle_activations_pairwise(
                             new_cached_activations_path,
-                            buffer_idx_range=(i - self.cfg.shuffle_every_n_buffers, i),
+                            buffer_idx_range=(start,end),
                         )
 
                     # Do more random pairwise shuffling between all the buffers
                     for _ in range(self.cfg.n_shuffles_in_entire_dir):
                         self.shuffle_activations_pairwise(
                             new_cached_activations_path,
-                            buffer_idx_range=(0, i),
+                            buffer_idx_range=(0, end),
                         )
             except StopIteration:
-                print(
-                    f"Warning: Ran out of samples while filling the buffer at batch {i} before reaching {n_buffers} batches. No more caching will occur."
+                logger.warning(
+                    "Ran out of samples while filling the buffer at batch {} before reaching {} batches. "
+                    "No more caching will occur.",
+                    i,
+                    n_buffers,
                 )
                 break
 
         # More final shuffling (mostly in case we didn't end on an i divisible by shuffle_every_n_buffers)
-        if n_buffers > 1:
+        if produced > 1:
             for _ in tqdm(range(self.cfg.n_shuffles_final), desc="Final shuffling"):
                 self.shuffle_activations_pairwise(
                     new_cached_activations_path,

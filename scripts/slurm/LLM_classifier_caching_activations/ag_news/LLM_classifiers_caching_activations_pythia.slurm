@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --account=dun@v100
+#SBATCH -C v100
+#SBATCH --job-name=sim_eval
+#SBATCH --nodes=1               # Request 1 node
+#SBATCH --ntasks=1              # One task per array job
+#SBATCH --cpus-per-task=10   
+#SBATCH --gpus-per-task=1            # Request 1 GPU per task
+#SBATCH --time=2:00:00
+#SBATCH --qos=qos_gpu-dev
+#SBATCH --hint=nomultithread
+#SBATCH --output=./logs/output/slurm-%A_%a.out.log
+#SBATCH --error=./logs/output/slurm-%A_%a.out.log
+
+# Ensure the script stops on errors
+set -e
+
+# Initialize conda functions in this shell
+eval "$(conda shell.bash hook)"
+
+# Load Conda environment
+conda activate ClassifSAE_env
+
+# Cache the sentence-level hidden-state activations extracted from the residual stream 
+# of the penultimate transformer block of the Pythia backbones fine-tuned on AG News.
+# The inference is done on the training split of AG News 
+
+# AG NEWS
+python -m sae_classification save-activations-classifier --config=configs/cache_LLM_classifier_activations/pythia_410m/cache_activations_classifier_agnews.cfg
+python -m sae_classification save-activations-classifier --config=configs/cache_LLM_classifier_activations/pythia_1b/cache_activations_classifier_agnews.cfg
+

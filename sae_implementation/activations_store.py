@@ -1,26 +1,23 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/training/activations_store.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 #
 # NOTES:
 #   • We adapted the caching activation procedure in `get_buffer` so that we only cache a single hidden state per sentence. 
-#     It corresponds to the hidden state associated with the token preceding the classification label. 
+#     For a decoder-only model, it corresponds to the hidden state associated with the token preceding the classification label. 
 #   • We enabled joint caching of the LLM-predicted label for each sentence by concatenating the predicted label index with the cached activation ('self.save_label' option)
 #
 # =============================================================================
 
 
-from __future__ import annotations
-
 import contextlib
 import os
-from typing import Any, Generator, Iterator, Literal, cast
-
+from typing import Any, Iterator, Literal, cast
 import numpy as np
 import torch
-from datasets import concatenate_datasets
+from datasets import concatenate_datasets, DatasetDict
 from safetensors import safe_open
 from safetensors.torch import save_file
 from torch.utils.data import DataLoader
@@ -40,14 +37,13 @@ from .config import (
 
 class ActivationsStore:
     """
-    Class for streaming tokens and generating and storing activations
-    while training SAEs.
+    Class for streaming tokens and generating and storing activations while training SAEs.
     """
 
     model: HookedRootModule
     dataset: HfDataset
     cached_activations_path: str | None
-    tokens_column: Literal["tokens", "input_ids", "text", "problem"]
+    tokens_column: Literal["input_ids"]
     hook_name: str
     hook_layer: int
     _dataloader: Iterator[Any] | None = None
@@ -85,6 +81,7 @@ class ActivationsStore:
             device=torch.device(cfg.act_store_device),
             dtype=cfg.dtype,
             cached_activations_path=cached_activations_path,
+            prompt_embeddings_path=cfg.prompt_embeddings_path,
             model_kwargs=cfg.model_kwargs,
             autocast_lm=cfg.autocast_lm,
             eos=cfg.eos,
@@ -109,6 +106,7 @@ class ActivationsStore:
         device: torch.device,
         dtype: str,
         cached_activations_path: str | None = None,
+        prompt_embeddings_path: str | None = None,
         model_kwargs: dict[str, Any] | None = None,
         autocast_lm: bool = False,
         eos: bool = False,
@@ -121,6 +119,15 @@ class ActivationsStore:
             model_kwargs = {}
         self.model_kwargs = model_kwargs
         self.dataset = dataset
+        
+        if isinstance(self.dataset, DatasetDict):
+            if "train" in self.dataset:
+                self.dataset = self.dataset["train"]
+            else:
+                raise ValueError(
+                "DatasetDict provided but no 'train' split found. "
+                "Pass a specific split (e.g., dataset['validation'])."
+                )
 
         self.hook_name = hook_name
         self.hook_layer = hook_layer
@@ -135,61 +142,53 @@ class ActivationsStore:
         self.device = torch.device(device)
         self.dtype = DTYPE_MAP[dtype]
         self.cached_activations_path = cached_activations_path
+        self.prompt_embeddings_path = prompt_embeddings_path
         self.autocast_lm = autocast_lm
         self.eos = eos
         self.prompt_tuning = prompt_tuning
         self.save_label = save_label
 
-
-        #We use this global index to know where we are at in the dataset to fill a new buffer.
+        # Global index into dataset to know where to resume when filling a new buffer.
         self.dataset_idx_last_token = 0 
 
         if self.model is not None :
-            #We only cache the hidden state associated to the token preceding the class-generating token outputed by the decoder-only model for classification
+            # We only cache the hidden state associated with the token preceding the class-generating token
+            # emitted by the decoder-only model for classification.
             self.data_collator = DataCollatorForLanguageModeling(tokenizer=self.model.tokenizer,mlm=False)
 
         self.n_dataset_processed = 0
-
         self.estimated_norm_scaling_factor = 1.0
 
         if self.dataset is not None:
-            # Check if dataset is tokenized (verification)
-            self.iterable_dataset = iter(self.dataset)
-            dataset_sample = next(self.iterable_dataset)
-    
-            # check if it's tokenized
-            if "input_ids" in dataset_sample.keys():
+            # Verify dataset is tokenized and offers 'input_ids'
+            if len(self.dataset) == 0:
+                raise ValueError("Dataset is empty.")
+            sample = self.dataset[0]
+            if "input_ids" in sample:
                 self.is_dataset_tokenized = True
                 self.tokens_column = "input_ids"
             else:
-                raise ValueError(
-                    "Dataset must have a 'input_ids' column."
-                )
-    
-            self.iterable_dataset = iter(self.dataset)  # Reset iterator after checking
-            
-            if self.is_dataset_tokenized:
-            
-                if hasattr(self.dataset, "set_format"):
-                    self.dataset.set_format(type="torch", columns=[self.tokens_column]) 
-    
+                raise ValueError("Dataset must provide 'input_ids' (tokenized) column.")
+
+            if self.is_dataset_tokenized and hasattr(self.dataset, "set_format"):
+                self.dataset.set_format(type="torch", columns=[self.tokens_column])
             else:
                 print(
                     "Error: Dataset is not tokenized. This is not expected"
                 )
+            
+            
 
         self.check_cached_activations_against_config()
 
    
-
   
     def check_cached_activations_against_config(self):
 
         if self.cached_activations_path is not None:  
-            assert self.cached_activations_path is not None  
             assert os.path.exists(
                 self.cached_activations_path
-            ), f"Cache directory {self.cached_activations_path} does not exist. Consider double-checking your dataset, model, and hook names."
+            ), f"Cache directory {self.cached_activations_path} does not exist. Check dataset/model/hook names."
 
             self.next_cache_idx = 0  # which file to open next
             self.next_idx_within_buffer = 0  # where to start reading from in that file
@@ -223,7 +222,7 @@ class ActivationsStore:
         """
         Resets the input dataset iterator to the beginning.
         """
-        self.iterable_dataset = iter(self.dataset)
+        self.dataset_idx_last_token = 0
 
     @property
     def storage_buffer(self) -> torch.Tensor:
@@ -246,10 +245,9 @@ class ActivationsStore:
     ) -> torch.Tensor:
         """
         Loads the next n_batches_in_buffer batches of activations into a tensor and returns half of it.
-
-        The primary purpose here is maintaining a shuffling buffer.
-        
         """
+        if self.dataset is None and self.cached_activations_path is None:
+            raise ValueError("Either dataset or cached_activations_path must be provided.")
 
         batch_size = self.store_batch_size_prompts
         d_in = self.d_in
@@ -257,25 +255,18 @@ class ActivationsStore:
         num_layers = 1
         
 
-        # If the activations have already been cached and saved and you want to access a buffer for the training of the SAE.
+        # If activations are cached on disk and we want to fetch them for SAE training:
         if self.cached_activations_path is not None:
-            
-            
+                
             # Initialize an empty tensor.
             # There is a dimension for the number of cached layers, currently we only cache for a single layer.
             # Add an extra channel to concatenate the label predicted by the model with its vector representation of the sentence at the studied layer.
-            if self.save_label:
-                new_buffer = torch.zeros(
-                    (buffer_size, num_layers, d_in+1),
-                    dtype=self.dtype,
-                    device=self.device,
-                )
-            else:
-                 new_buffer = torch.zeros(
-                    (buffer_size, num_layers, d_in),
-                    dtype=self.dtype, 
-                    device=self.device,
-                )
+            expected_last_dim = d_in + 1 if self.save_label else d_in
+            new_buffer = torch.zeros(
+                (buffer_size, num_layers, expected_last_dim),
+                dtype=self.dtype,
+                device=self.device,
+            )
             n_tokens_filled = 0
 
             while n_tokens_filled < buffer_size:
@@ -283,54 +274,61 @@ class ActivationsStore:
                 # For an ActivationStore object, next_cache_idx keeps in memory which buffer files have not been provided yet in the training. 
                 # When they have been provided all at least once, it resets the index and the cycle begins again.
                 # It is useful in practice if the number of training steps is greater than the number of cached states. 
-                if not os.path.exists(
-                    f"{self.cached_activations_path}/{self.next_cache_idx}.safetensors"
-                ):
+                cache_file = os.path.join(self.cached_activations_path, f"{self.next_cache_idx}.safetensors")
 
-                    # If the cache file of index 0 is not present, it means no activation files have saved in the provided directory
+                # If the expected cache file does not exist
+                if not os.path.exists(cache_file):
                     if self.next_cache_idx == 0:
-                        raise ValueError(
-                            f"\n\n: The activation directory {self.cached_activations_path} is empty"
-                        )
+                        raise ValueError(f"The activation directory {self.cached_activations_path} is empty")
                     else:
-                        # We reset at the beginning of the buffers (as we do have less activations, we train multiple times on the same activations)
+                        # Reset to beginning; we will repeat cached activations as needed
                         self.next_cache_idx = 0
+                        self.next_idx_within_buffer = 0
+                        cache_file = os.path.join(self.cached_activations_path, f"{self.next_cache_idx}.safetensors")
                     
+                full = self.load_buffer(cache_file)
 
-                activations = self.load_buffer(
-                    f"{self.cached_activations_path}/{self.next_cache_idx}.safetensors"
-                )
+                # Validate last dimension matches configuration
+                if full.size(-1) != expected_last_dim:
+                    raise ValueError(
+                        f"Cached buffer last dim {full.size(-1)} does not match expected {expected_last_dim}. "
+                        f"Ensure caches were generated with save_label={self.save_label} and d_in={self.d_in}."
+                    )
 
-                activations = activations[self.next_idx_within_buffer:, ...]
+                file_len = full.shape[0]
+                start = self.next_idx_within_buffer
                 
-                # Take only a subset of activations from the loaded safetensors file if the requested buffer size is less than its size 
-                taking_subset_of_file = False
-                if n_tokens_filled + activations.shape[0] > buffer_size:
-                    activations = activations[: buffer_size - n_tokens_filled, ...]
-                    taking_subset_of_file = True
-
-                new_buffer[
-                    n_tokens_filled : n_tokens_filled + activations.shape[0], ...
-                ] = activations
-
-                if taking_subset_of_file:
-                    self.next_idx_within_buffer = activations.shape[0]
-                else:
+                if start >= file_len:
+                    # At EOF for this file; move to next and continue
                     self.next_cache_idx += 1
                     self.next_idx_within_buffer = 0
+                    continue
 
-                n_tokens_filled += activations.shape[0]
+                remaining_in_file = file_len - start
+                remaining_in_buffer = buffer_size - n_tokens_filled
+                take = min(remaining_in_file, remaining_in_buffer)
+
+                chunk = full[start : start + take, ...]
+                new_buffer[n_tokens_filled : n_tokens_filled + take, ...] = chunk
+                
+                # Advance pointers
+                n_tokens_filled += take
+                self.next_idx_within_buffer = start + take
+                
+                if self.next_idx_within_buffer >= file_len:
+                    # Move to next file and reset within-file index
+                    self.next_cache_idx += 1
+                    self.next_idx_within_buffer = 0
 
             return new_buffer
 
 
-        '''
-            In the context of caching new hidden states for the first time, we start directly here.
-        '''
         
-        # Initialize an empty tensor of the maximum required size
-        # There is a dimension for the number of cached layers, currently we only cache for a single layer.
-        # There is a dimension for the 'context', currently as we only cache the hidden state of the token preceding the class-generating token per sentence, the context is fixed to 1.
+        # In the context of caching new hidden states for the first time, we start here.
+        
+        # Initialize an empty tensor of the maximum required size.
+        # There is a dimension for the number of cached layers (currently 1)
+        # There is a dimension for the "context" (currently 1 since we only cache the sentence-level token embedding per sentence).
         context_size=1
         new_buffer = torch.zeros(
             (buffer_size, context_size, num_layers, d_in),
@@ -338,7 +336,8 @@ class ActivationsStore:
             device=self.device,
         )
 
-        # If we save the labels, we initialize an empty tensor to store them
+        # If we save the labels,  initialize a buffer to store them.
+        buffer_labels = None
         if self.save_label:
             buffer_labels = torch.zeros((buffer_size),dtype=self.dtype,device=self.device)
 
@@ -347,7 +346,6 @@ class ActivationsStore:
         We want all our buffers to be of same size for simplicity, therefore in the event when the buffer size provided does not divide the length of the sentences dataset, we fill the last buffer with duplicate hidden states of sentences. 
         This is not ideal, preferably the size of the buffer specified shall divide the length of the dataset so that we only cache once different samples.
         '''
-        
         remaining_prompts = len(self.dataset) - self.dataset_idx_last_token
         if remaining_prompts > buffer_size :
             selected_dataset = self.dataset.select(
@@ -355,11 +353,7 @@ class ActivationsStore:
             )
             self.dataset_idx_last_token += buffer_size
         else: 
-            '''
-            In that case, we know it only concerns the last buffer since
-            n_buffers = math.ceil(self.cfg.training_tokens / buffer_size): defined in caching_for_sae.py
-            '''
-            #We concatenate the end of the dataset with randomly selected elements from 'self.dataset'
+            # Last buffer: concatenate tail of dataset with random samples to complete the buffer
             end_of_dataset = self.dataset.select(
                 list(range(self.dataset_idx_last_token, len(self.dataset)))
             )
@@ -374,8 +368,25 @@ class ActivationsStore:
         selected_dataset.cleanup_cache_files()
         selected_dataset = selected_dataset.with_format("python")
 
-        # Create DataLoader
+        # Create DataLoader over selected sentences
         dataloader_sentence_hidden_states = DataLoader(selected_dataset, batch_size=self.store_batch_size_prompts, collate_fn=self.data_collator)
+
+        # Load prompt-tuning embeddings (optional)
+        if self.prompt_embeddings_path is not None:
+            try:
+                prompt_embeddings = torch.load(self.prompt_embeddings_path, map_location=self.model.cfg.device) 
+                logger.info(
+                    "Prompt embeddings loaded from {}. Using them for activations caching.",
+                    self.prompt_embeddings_path,
+                )
+            except (FileNotFoundError, IOError):
+                prompt_embeddings = None
+                logger.warning(
+                    "Cannot open {}. Skipping prompt embeddings for activations caching.",
+                    self.prompt_embeddings_path,
+                )
+        else:
+            prompt_embeddings = None
 
         self.model.eval()
 
@@ -398,62 +409,101 @@ class ActivationsStore:
                     autocast_if_enabled = contextlib.nullcontext()
 
                 with autocast_if_enabled:
-
-                    '''Manually fixing the issue of sentence longer than the context windows size since it is not automatically handled by 
-                    transformer-lens and it causes conflict with the positional embedding that is done on a vector of size the context attention windows'''
-                    if batch_tokens.shape[1] > self.model.cfg.n_ctx:
-                        attention_mask = attention_mask[:,-self.model.cfg.n_ctx:]
-                        batch_tokens = batch_tokens[:,-self.model.cfg.n_ctx:] # It is not an issue since we want to predict for almost the last token, so it looses almost nothing of the context it could have seen otherwise in practice.
-                            
-                    # Run inference on the LLM classifier while simultaneously caching the inspected layer, we can stop the inference at the inspected layer.
-                    layerwise_activations = self.model.run_with_cache(
-                        batch_tokens,
-                        attention_mask=attention_mask,
-                        names_filter=[self.hook_name],
-                        stop_at_layer=self.hook_layer + 1,
-                        prepend_bos=self.prepend_bos,
-                        **self.model_kwargs,
-                    )[1]
                     
+                    # If prompt-tuning was done to align the model with the classification task, we
+                    # add the prompt embeddings at the beginning of the tokenized sentence via a hook.
+                    if prompt_embeddings is not None:
+                        vtok = prompt_embeddings.size(0)
+                        emb = self.model.embed(batch_tokens)
+                        bs = batch_tokens.size(0)
+                        if (emb.shape[1]+vtok) > self.model.cfg.n_ctx:
+                            # Trim to fit within context window when prompt tokens are added.
+                            emb = emb[:,-(self.model.cfg.n_ctx-vtok):] 
+                            attention_mask = attention_mask[:,-(self.model.cfg.n_ctx-vtok):]
+                       
+                        P = prompt_embeddings.unsqueeze(0).expand(bs, -1, -1)
+                        new_emb = torch.cat([P, emb], dim=1) 
+
+                        def override_embed(resid_pre, hook):        # resid_pre is (B, L, d_model)
+                            return new_emb                       
+
+                        B, L, _ = new_emb.shape         # (batch, seq_len, d_model)
+                        dummy_tokens  = torch.zeros(B, L, dtype=torch.long, device=self.model.cfg.device)
+                        prefix_mask = torch.ones(bs, vtok, device=self.model.cfg.device).long()
+                        attention_mask   = torch.cat([prefix_mask, attention_mask], dim=1) 
+
+                    
+                        # We directly add the prompt embeddings at the beginning of the tokenized sentence after the encoding matrix through a hook
+                        with self.model.hooks(
+                                fwd_hooks=[("hook_embed", override_embed)]
+                        ):
+                            layerwise_activations = self.model.run_with_cache(
+                                dummy_tokens,
+                                attention_mask=attention_mask,
+                                names_filter=[self.hook_name],
+                                stop_at_layer=self.hook_layer + 1,
+                                prepend_bos=False,
+                                **self.model_kwargs
+                            )[1]
+
+                
+                        
+                    else:
+   
+                        # Run inference on the LLM classifier while caching the inspected layer.
+                        layerwise_activations = self.model.run_with_cache(
+                            batch_tokens,
+                            attention_mask=attention_mask,
+                            names_filter=[self.hook_name],
+                            stop_at_layer=self.hook_layer + 1,
+                            prepend_bos=self.prepend_bos,
+                            **self.model_kwargs,
+                        )[1]
+                
+                if self.hook_name not in layerwise_activations:
+                    raise KeyError(f"Hook {self.hook_name} not found in cached activations")
                 
                 n_prompts, _ = batch_tokens.shape
         
-                stacked_activations = torch.zeros((n_prompts, context_size, 1, self.d_in))
+                # Allocate per-batch buffer on correct device/dtype
+                stacked_activations = torch.zeros(
+                    (n_prompts, context_size, 1, self.d_in),
+                    dtype=self.dtype,
+                    device=self.device,
+                )
                 
-            
-                # It assumes that the activation does not come from a head dimension
-                # We only select the activation of the hidden state associated to the token preceding the class-generating prediction.
-                stacked_activations[:, :, 0] = layerwise_activations[self.hook_name][:,(-2-int(self.eos)),:].unsqueeze(1)
-                stacked_activations.to(self.device)
-
+                # It assumes that the activation does not come from a head dimension                
+                # Pick the activation of the token preceding the class token.
+                # Compute the last valid token and account for eos if configured.
+                picked = layerwise_activations[self.hook_name][:,(-2-int(self.eos)),:].unsqueeze(1) # (B, 1, d_in)
+                stacked_activations[:, :, 0] = picked.to(stacked_activations.dtype)
+                
                 new_buffer[
                     num_batch*batch_size : num_batch*batch_size + stacked_activations.shape[0], ...
                 ] = stacked_activations
 
-                # If we save the labels (for the classifier part of ClassifSAE)
+                # Save labels for the classifier component of ClassifSAE
                 if self.save_label:
-                    buffer_labels[num_batch*batch_size : num_batch*batch_size + stacked_activations.shape[0]] = predicted_labels
+                    buffer_labels[num_batch*batch_size : num_batch*batch_size + stacked_activations.shape[0]] = predicted_labels.to(buffer_labels.dtype)
         
 
-        # We only keep the dimensions regarding the buffer size, the number of layers cached (currently assumed at 1 only but it could be improved) and the dimension of the residual stream
+        # Keep the dimensions regarding the buffer size,  number of layers (1) and the dimension of the residual stream
         new_buffer = new_buffer.reshape(-1, num_layers, d_in)
 
-        # Every buffer should be normalized:
+        #  No normalization during caching except when explicitly requested.
         if self.normalize_activations == "expected_average_only_in":
             new_buffer = self.apply_norm_scaling_factor(new_buffer)
                     
         if self.save_label:
-
-            buffer_labels = buffer_labels.to(dtype=torch.int)
-            buffer_labels = buffer_labels.unsqueeze(1).unsqueeze(2)
-
-            # We concatenate the predicted label with the corresponding cached sentence representation
+            # Keep labels in same dtype as activations to allow concatenation.
+            buffer_labels = buffer_labels.to(dtype=self.dtype).unsqueeze(1).unsqueeze(2)
+            # Concatenate the predicted label with the corresponding cached sentence representation
             new_buffer = torch.cat((new_buffer, buffer_labels), dim=2)
             
-        
-        new_buffer = new_buffer[torch.randperm(new_buffer.shape[0])]
+        # Shuffle buffer with index tensor on the same device for portability (CPU/GPU)
+        perm = torch.randperm(new_buffer.shape[0], device=new_buffer.device)
+        new_buffer = new_buffer[perm]
 
-        
         return new_buffer
 
     def save_buffer(self, buffer: torch.Tensor, path: str):
@@ -506,7 +556,9 @@ class ActivationsStore:
             dim=0,
         )
 
-        mixing_buffer = mixing_buffer[torch.randperm(mixing_buffer.shape[0])]
+        # Shuffle once here (no need to reshuffle in the DataLoader)
+        perm = torch.randperm(mixing_buffer.shape[0], device=mixing_buffer.device)
+        mixing_buffer = mixing_buffer[perm]
 
         # 2.  put 50 % in storage
         self._storage_buffer = mixing_buffer[: mixing_buffer.shape[0] // 2]
@@ -516,7 +568,7 @@ class ActivationsStore:
             DataLoader(
                 cast(Any, mixing_buffer[mixing_buffer.shape[0] // 2 :]),
                 batch_size=batch_size,
-                shuffle=True,
+                shuffle=False,
             )
         )
 
@@ -526,7 +578,7 @@ class ActivationsStore:
         """
         Get the next batch from the current DataLoader.
         If the DataLoader is exhausted, refill the buffer and create a new DataLoader.
-        return_label_if_any is True if we want to retrieve the concatenated class labels as well
+        Set return_label_if_any=True to keep the concatenated class labels (if present).
         """
         try:
             # Try to get the next batch

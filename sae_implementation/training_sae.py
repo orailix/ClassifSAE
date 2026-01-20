@@ -1,23 +1,28 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/training/training_sae.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 #
 # NOTES:
 #   • We enabled joint caching of the LLM-predicted label for each sentence by concatenating the predicted label index with the cached activation ('self.save_label' option)
 #   • Modification of `training_forward_pass` to pass predicted label information when needed as well as the current epoch number.
-#   • In `training_forward_pass` function, we define several additional loss terms in the final training objective to encourage the SAE to learn more meaningful decorrelated features in z_class, they are activated based on the weights defined by the user.
+#   • In `training_forward_pass` function, we define additional loss terms in the final training objective (classifier head loss and activation rate sparsity loss) to encourage ClassifSAE to learn  
+#      decorrelated classification relevant features in z_class, they are activated based on the weights defined by the user.
 #    
 # =============================================================================
 
 import json
-import logging
 import os
 from typing import Any, Optional
 from dataclasses import dataclass, fields
 
 import torch
+import einops
+from jaxtyping import Float
+from torch import nn
+import torch.nn.functional as F
+import math
 
 from .config import LanguageModelSAERunnerConfig, DTYPE_MAP
 from .sae import SAE, SAEConfig, SAE_CFG_PATH, SAE_WEIGHTS_PATH
@@ -26,41 +31,10 @@ from .toolkit.pretrained_sae_loaders import (
     read_sae_from_disk,
 )
 
-
-import einops
-from jaxtyping import Float
-from torch import nn
-import torch.nn.functional as F
-import math
-
-
-import time
-
-
 SPARSITY_PATH = "sparsity.safetensors"
 SAE_WEIGHTS_PATH = "sae_weights.safetensors"
 SAE_CFG_PATH = "cfg.json"
 
-
-import torch
-
-
-
-def linear_decay(epoch, max_epochs, initial_weight=1.0, min_weight=0.0):
-    slope = (min_weight - initial_weight) / max_epochs
-    weight = initial_weight + slope * epoch
-    return max(min_weight, weight)  # clamp at min_weight
-
-def linear_increase(epoch, max_epochs, initial_weight=0.0, max_weight=1.0):
-    slope = (max_weight - initial_weight) / max_epochs
-    weight = initial_weight + slope * epoch
-    return min(max_weight, weight)  # clamp at max_weight
-
-def exp_decay(epoch, decay_rate=0.05, min_weight=0.0):
-    return max(min_weight, math.exp(-decay_rate * epoch))
-
-def exponential_increase(epoch, k=0.05, max_weight=1.0, initial_weight=0.0):
-    return min(max_weight, initial_weight + (max_weight - initial_weight)*(1 - math.exp(-k * epoch)))
 
 def sparse_efficient_outer_product_sum(vectors):
     """
@@ -92,7 +66,7 @@ class TrainStepOutput:
     l1_loss: float
     ghost_grad_loss: float
     auxiliary_reconstruction_loss: float = 0.0
-    feature_sparsity_loss: float = 0.0
+    activation_rate_sparsity_loss: float = 0.0
     vcr_loss: float = 0.0
     decoder_columns_similarity_loss: float = 0.0
     classifier_loss: float = 0.0
@@ -106,7 +80,7 @@ class TrainingSAEConfig(SAEConfig):
     lp_norm: float
     use_ghost_grads: bool
     lmbda_mse: float
-    lmbda_feature_sparsity: float
+    lmbda_activation_rate: float
     lmbda_vcr: float
     lmbda_decoder_columns_similarity: float
     lmbda_classifier: float
@@ -145,7 +119,7 @@ class TrainingSAEConfig(SAEConfig):
             lp_norm=cfg.lp_norm,
             use_ghost_grads=cfg.use_ghost_grads,
             lmbda_mse=cfg.lmbda_mse,
-            lmbda_feature_sparsity=cfg.lmbda_feature_sparsity,
+            lmbda_activation_rate=cfg.lmbda_activation_rate,
             lmbda_vcr=cfg.lmbda_vcr,
             lmbda_decoder_columns_similarity=cfg.lmbda_decoder_columns_similarity, 
             lmbda_classifier=cfg.lmbda_classifier,
@@ -179,7 +153,7 @@ class TrainingSAEConfig(SAEConfig):
             "lp_norm": self.lp_norm,
             "use_ghost_grads": self.use_ghost_grads,
             "lmbda_mse": self.lmbda_mse,
-            "lmbda_feature_sparsity": self.lmbda_feature_sparsity,
+            "lmbda_activation_rate": self.lmbda_activation_rate,
             "lmbda_vcr": self.lmbda_vcr,
             "lmbda_decoder_columns_similarity": self.lmbda_decoder_columns_similarity,
             "lmbda_classifier": self.lmbda_classifier,
@@ -236,6 +210,8 @@ class TrainingSAE(SAE):
         base_sae_cfg = SAEConfig.from_dict(cfg.get_base_sae_cfg_dict())
         super().__init__(base_sae_cfg)
         self.cfg = cfg  
+
+        self.epoch = 0
 
         self.encode_with_hidden_pre_fn = (
             self.encode_with_hidden_pre
@@ -330,7 +306,6 @@ class TrainingSAE(SAE):
         return sae_out
 
 
-
     def training_forward_pass(
         self,
         sae_in: torch.Tensor,
@@ -342,27 +317,29 @@ class TrainingSAE(SAE):
         labels: torch.Tensor = None
     ) -> TrainStepOutput:
 
+
         # Ensure labels are indeed long
         labels = labels.long()
-
-        # Randomly add noise on sae_in : 
-        batch_mean = sae_in.mean(0, keepdim=True)
-        batch_std  = sae_in.std (0, keepdim=True, unbiased=False).clamp_min(1e-3)
-        noise_scale = batch_std
-        eps = torch.randn_like(sae_in) * (0.2 * noise_scale)
-        sae_in_noised = sae_in + eps
-
         
         # Do a forward pass to retrieve the hidden layer SAE activations, before and after the application of the activation function
-        feature_acts, hidden_pre = self.encode_with_hidden_pre_fn(sae_in_noised)
-    
-        sae_out = self.decode(feature_acts)
+        feature_acts, hidden_pre = self.encode_with_hidden_pre_fn(sae_in)
+      
+        # Split SAE features into classification-related and context-related parts
+        z_class = feature_acts[:,:self.cfg.num_classifier_features]
+        z_ctx = feature_acts[:,self.cfg.num_classifier_features:]
+
+        # SAE DECODING
+        if epoch_number < total_epochs // 2:
+            sae_out = self.decode( torch.cat([z_class,z_ctx], dim=-1))
+        else:
+            sae_out = self.decode( torch.cat([z_class.detach(),z_ctx], dim=-1))
+
 
         # MSE LOSS
         per_item_mse_loss = self.mse_loss_fn(sae_out, sae_in)
         # We rescale the mse loss based on its weight in the final training objective
-        per_item_mse_loss = self.cfg.lmbda_mse * per_item_mse_loss
         mse_loss = per_item_mse_loss.sum(dim=-1).mean()
+
 
         # GHOST GRADS
         if self.cfg.use_ghost_grads and self.training and dead_neuron_mask is not None:
@@ -379,6 +356,7 @@ class TrainingSAE(SAE):
             )
         else:
             ghost_grad_loss = 0.
+
         
        
         if self.cfg.lmbda_classifier > 0 :
@@ -388,21 +366,24 @@ class TrainingSAE(SAE):
             z_class is assigned as the truncation of the first 'self.cfg.num_classifier_features' dimensions in the SAE hidden layer. 
             '''
             if labels is not None:
-                classifier_logits_preds = feature_acts[:,:self.cfg.num_classifier_features] @ self.classifier_weight.t() + self.classifier_bias
-
+                
+                batch_dim, sae_hidden_dim = feature_acts.shape            
+        
+                logits = z_class @ self.classifier_weight.t() + self.classifier_bias
                 ce_loss = nn.CrossEntropyLoss()
-                base_classifier_loss = ce_loss(classifier_logits_preds, labels)
-                classifier_loss = self.cfg.lmbda_classifier * base_classifier_loss
+                classifier_loss = ce_loss(logits, labels)
+                classifier_loss = classifier_loss 
+                
             else:
-                classifier_loss = torch.tensor(0.0)            
+                classifier_loss = torch.tensor(0.0)   
            
         else:
             classifier_loss = torch.tensor(0.0)
 
 
-        if self.cfg.lmbda_feature_sparsity > 0:
-
-            batch_dim, _ = feature_acts.shape
+        if self.cfg.lmbda_activation_rate > 0 :
+           
+            batch_dim, d_sae = feature_acts.shape
 
             # Determine the number of elements to exclude per column
             exclude_count = int(batch_dim * self.cfg.feature_activation_rate)
@@ -412,15 +393,18 @@ class TrainingSAE(SAE):
                 mask = torch.ones_like(feature_acts, dtype=torch.bool) 
                 mask.scatter_(0, idxs, False)  # place 'False' at top-k positions
 
+
             masked_features_acts = mask * feature_acts
+                
             # Compute the sum of the remaining elements for each column
             sum_mask_features_acts = (masked_features_acts).sum(dim=0)
 
             # We only penalize feature activation rate above the frequency threshold imposed by the user
-            feature_sparsity_loss = self.cfg.lmbda_feature_sparsity * (1/batch_dim) * ( (sum_mask_features_acts.sum()))
+            activation_rate_sparsity_loss = sum_mask_features_acts.sum() / batch_dim
+
 
         else:
-            feature_sparsity_loss = torch.tensor(0.0)
+            activation_rate_sparsity_loss = torch.tensor(0.0)
             
         if self.cfg.lmbda_vcr > 0 :
 
@@ -487,9 +471,13 @@ class TrainingSAE(SAE):
             aux_reconstruction_loss = torch.sum(
                 (via_gate_reconstruction - sae_in) ** 2, dim=-1
             ).mean()
+            
+            # Multi-objective loss balancing
+            loss = self.cfg.lmbda_mse * (mse_loss + ghost_grad_loss) + aux_reconstruction_loss +  self.cfg.lmbda_activation_rate * activation_rate_sparsity_loss +  self.cfg.lmbda_classifier * classifier_loss
 
-            loss = mse_loss + l1_loss + aux_reconstruction_loss + feature_sparsity_loss + vcr_loss + decoder_columns_similarity_loss
+            
         else:
+            
             # default SAE sparsity loss
             weighted_feature_acts = feature_acts * self.W_dec.norm(dim=1)
             sparsity = weighted_feature_acts.norm(
@@ -502,15 +490,13 @@ class TrainingSAE(SAE):
             l1_loss = (current_l1_coefficient * sparsity).mean() 
 
             aux_reconstruction_loss = torch.tensor(0.0)
-                  
-            if self.cfg.lmbda_classifier > 0:
-                # ClassifSAE loss (activation rate sparsity mechanism with `feature_sparsity_loss` and classifier influence with `classifier_loss`)
-                loss = l1_loss + linear_decay(epoch_number,total_epochs)*(feature_sparsity_loss + mse_loss + ghost_grad_loss)  + decoder_columns_similarity_loss + classifier_loss + vcr_loss
-            else:
-                loss = mse_loss + l1_loss + ghost_grad_loss + feature_sparsity_loss + vcr_loss + decoder_columns_similarity_loss  
-      
+            
+            # Multi-objective loss balancing
+            loss = self.cfg.lmbda_mse * (mse_loss + ghost_grad_loss) +  self.cfg.lmbda_activation_rate * activation_rate_sparsity_loss +  self.cfg.lmbda_classifier * classifier_loss
 
-    
+
+        self.epoch = epoch_number
+
         return TrainStepOutput(
             sae_in=sae_in,
             sae_out=sae_out,
@@ -524,7 +510,7 @@ class TrainingSAE(SAE):
                 else ghost_grad_loss
             ),
             auxiliary_reconstruction_loss=aux_reconstruction_loss.item(),
-            feature_sparsity_loss = feature_sparsity_loss.item(),
+            activation_rate_sparsity_loss = activation_rate_sparsity_loss.item(),
             vcr_loss = vcr_loss.item(),
             decoder_columns_similarity_loss = decoder_columns_similarity_loss.item(),
             classifier_loss = classifier_loss.item()
@@ -702,7 +688,11 @@ class TrainingSAE(SAE):
         Update grads so that they remove the parallel component
             (d_sae, d_in) shape
         """
-        assert self.W_dec.grad is not None
+        # assert self.W_dec.grad is not None
+
+        # if W_dec is frozen then no grad has been accumulated
+        if self.W_dec.grad is None:
+            return
 
         parallel_component = einops.einsum(
             self.W_dec.grad,

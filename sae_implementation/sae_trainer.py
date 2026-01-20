@@ -1,12 +1,12 @@
 # =============================================================================
 # This file is adapted from:
 #   SAELens (v 3.13.0) (https://github.com/jbloomAus/SAELens/blob/v3.13.0/sae_lens/training/sae_trainer.py)
-#   License: MIT (see https://github.com/m-lebail/Concept_Interpretability_LLM/tree/main/SAELens_License/LICENSE)
+#   License: MIT (see https://github.com/orailix/ClassifSAE/blob/main/SAELens_License/LICENSE)
 #
 #
 # NOTES:
-#   • We only did minor modifications here. 
-#     We essentially just modified the call to `_train_step` to pass predicted label information when needed and adjusted the `_build_train_step_log_dict` function to display our model’s additional specific training losses in wandb.
+#   • Modifications of `_train_step` to pass predicted label information when needed and adjusted 
+#    the `_build_train_step_log_dict` function to display ClassifSAE’s additional specific training losses in wandb.
 # =============================================================================
 
 
@@ -14,6 +14,7 @@ import os
 import json
 import contextlib
 import logging
+import re
 import signal
 from dataclasses import dataclass
 from typing import Any, cast, Optional
@@ -31,15 +32,19 @@ from transformer_lens.hook_points import HookedRootModule
 
 from .config import LanguageModelSAERunnerConfig, HfDataset
 from .activations_store import ActivationsStore
-from .training_sae import TrainingSAE, TrainStepOutput, TrainingSAEConfig, SPARSITY_PATH, SAE_WEIGHTS_PATH,SAE_CFG_PATH
+from .training_sae import (
+    TrainingSAE,
+    TrainStepOutput,
+    TrainingSAEConfig,
+    SPARSITY_PATH,
+    SAE_WEIGHTS_PATH,
+    SAE_CFG_PATH
+)
 from .optim import L1Scheduler, get_lr_scheduler
-
-
 
 
 class InterruptedException(Exception):
     pass
-
 
 def interrupt_callback(sig_num: Any, stack_frame: Any):
     raise InterruptedException()
@@ -123,17 +128,20 @@ class SAETrainer:
         for name, param in self.sae.named_parameters():
             if "scaling_factor" in name:
                 param.requires_grad = False
-
- 
-        self.optimizer = Adam(
-            sae.parameters(),
-            lr=cfg.lr,
-            betas=(
-                cfg.adam_beta1,
-                cfg.adam_beta2,
-            ),
-        )
         
+        # Optimizer with separate parameter groups and learning rates
+        self.optimizer = Adam(
+            [
+                # Shared encoder
+                {"params": [self.sae.W_enc, self.sae.b_enc], "lr": cfg.lr},
+                # Decoder (more conservative)
+                {"params": [self.sae.W_dec, self.sae.b_dec], "lr": cfg.lr },
+                # Classifier head (faster)
+                {"params": [self.sae.classifier_weight, self.sae.classifier_bias], "lr": cfg.lr },
+            ],
+            lr=cfg.lr,  # scheduler API needs this; per-group LRs override it
+            betas=(cfg.adam_beta1, cfg.adam_beta2),
+        )
         
         assert cfg.lr_end is not None  # this is set in config post-init
         self.lr_scheduler = get_lr_scheduler(
@@ -154,15 +162,19 @@ class SAETrainer:
             final_l1_coefficient=cfg.l1_coefficient,
         )
 
-        # Setup autocast if using
-        self.scaler = GradScaler(device='cuda',enabled=self.cfg.autocast)
-
+        device_str = str(self.cfg.device)
+        device_type = (
+            "cuda" if device_str.startswith("cuda") else ("mps" if device_str == "mps" else "cpu")
+        )
+        use_grad_scaler = bool(self.cfg.autocast) and device_type == "cuda"
+        self.scaler = GradScaler(device=device_type,enabled=use_grad_scaler)
 
         if self.cfg.autocast:
+            amp_dtype = torch.float16 if device_type == "mps" else torch.bfloat16
             self.autocast_if_enabled = torch.autocast(
-                device_type="cuda",
-                dtype=torch.bfloat16,
-                enabled=self.cfg.autocast,
+                device_type=device_type,
+                dtype=amp_dtype,
+                enabled=True,
             )
         else:
             self.autocast_if_enabled = contextlib.nullcontext()
@@ -190,15 +202,16 @@ class SAETrainer:
 
         self._estimate_norm_scaling_factor_if_needed()
 
-        # We count the number of training tokens corresponding to one epoch (based on the length of the training sentences dataset)
+        # Count the number of training tokens corresponding to one epoch (based on the length of the training sentences dataset)
         threshold_training_tokens = 0
         number_equivalent_epoch = 0
         total_equivalent_epochs = int(self.cfg.total_training_tokens/self.cfg.len_epoch)
        
+
         # Train loop
         while self.n_training_tokens < self.cfg.total_training_tokens:
             # Do a training step.
-            # We retrieve both the hidden state of the inspected layer concatenated with the classifier's predicted label if it was cached
+            # Retrieve both the hidden state of the inspected layer concatenated with the classifier's predicted label if it was cached
             layer_acts = self.activation_store.next_batch(return_label_if_any=True)[:, 0, :].to(self.sae.device)
 
             self.n_training_tokens += self.cfg.train_batch_size_tokens
@@ -208,13 +221,23 @@ class SAETrainer:
                 threshold_training_tokens -= self.cfg.len_epoch
                 number_equivalent_epoch += 1
 
-            
             if self.cfg.save_label:
                 labels = layer_acts[:,-1].to(dtype=torch.long)
                 layer_acts = layer_acts[:,:-1]
-                step_output = self._train_step(sae=self.sae, sae_in=layer_acts ,epoch_number=number_equivalent_epoch,total_equivalent_epochs=total_equivalent_epochs,labels=labels)
+                step_output = self._train_step(
+                    sae=self.sae, 
+                    sae_in=layer_acts,
+                    epoch_number=number_equivalent_epoch,
+                    total_equivalent_epochs=total_equivalent_epochs,
+                    labels=labels,
+                )
             else:
-                step_output = self._train_step(sae=self.sae, sae_in=layer_acts, epoch_number=number_equivalent_epoch,total_equivalent_epochs=total_equivalent_epochs)
+                step_output = self._train_step(
+                    sae=self.sae, 
+                    sae_in=layer_acts, 
+                    epoch_number=number_equivalent_epoch,
+                    total_equivalent_epochs=total_equivalent_epochs)
+
 
             if self.cfg.log_to_wandb:
                 self._log_train_step(step_output)
@@ -255,7 +278,7 @@ class SAETrainer:
         sae_in: torch.Tensor,
         epoch_number: int,
         total_equivalent_epochs: int,
-        labels: torch.Tensor=None
+        labels: Optional[torch.Tensor] = None,
     ):
 
         sae.train()
@@ -274,6 +297,7 @@ class SAETrainer:
         # https://pytorch.org/tutorials/recipes/recipes/amp_recipe.html
         with self.autocast_if_enabled:
 
+        
             train_step_output = self.sae.training_forward_pass(
                 sae_in=sae_in,
                 dead_neuron_mask=self.dead_neurons,
@@ -299,12 +323,15 @@ class SAETrainer:
             train_step_output.loss
         ).backward()  # loss.backward() if not autocasting
         self.scaler.unscale_(self.optimizer)  # needed to clip correctly
+        
+        # If normalizing decoder, remove gradient parallel to decoder before clipping
+        if self.cfg.normalize_sae_decoder:
+            sae.remove_gradient_parallel_to_decoder_directions()
+        
         torch.nn.utils.clip_grad_norm_(sae.parameters(), 1.0)
         self.scaler.step(self.optimizer)  
         self.scaler.update()
 
-        if self.cfg.normalize_sae_decoder:
-            sae.remove_gradient_parallel_to_decoder_directions()
 
         self.optimizer.zero_grad()
         self.lr_scheduler.step()
@@ -335,7 +362,7 @@ class SAETrainer:
         mse_loss = output.mse_loss
         l1_loss = output.l1_loss
         ghost_grad_loss = output.ghost_grad_loss
-        feature_sparsity_loss = output.feature_sparsity_loss
+        activation_rate_sparsity_loss = output.activation_rate_sparsity_loss
         vcr_loss = output.vcr_loss
         decoder_columns_similarity_loss = output.decoder_columns_similarity_loss
         classifier_loss = output.classifier_loss
@@ -348,19 +375,20 @@ class SAETrainer:
 
         per_token_l2_loss = (sae_out - sae_in).pow(2).sum(dim=-1).squeeze()
         total_variance = (sae_in - sae_in.mean(0)).pow(2).sum(-1)
-        explained_variance = 1 - per_token_l2_loss / total_variance
+        explained_variance = 1 - per_token_l2_loss / torch.clamp(total_variance, min=1e-12)
+        
+        
 
         return {
-            # losses are normalized by their coefficents in the objective function
-            "losses/mse_loss": mse_loss / self.cfg.lmbda_mse if self.cfg.lmbda_mse>0 else mse_loss,
-            "losses/l1_loss": l1_loss
-            / self.current_l1_coefficient if self.current_l1_coefficient!=0 else l1_loss,
+            # losses are normalized by their coefficients in the objective function
+            "losses/mse_loss": mse_loss ,
+            "losses/l1_loss": l1_loss,
             "losses/auxiliary_reconstruction_loss": output.auxiliary_reconstruction_loss,
             "losses/ghost_grad_loss": ghost_grad_loss,
-            "losses/feature_sparsity_loss": feature_sparsity_loss / self.cfg.lmbda_feature_sparsity if self.cfg.lmbda_feature_sparsity>0 else feature_sparsity_loss, 
-            "losses/vcr_loss": vcr_loss / self.cfg.lmbda_vcr if self.cfg.lmbda_vcr>0 else vcr_loss, 
-            "losses/decoder_columns_similarity_loss": decoder_columns_similarity_loss / self.cfg.lmbda_decoder_columns_similarity if self.cfg.lmbda_decoder_columns_similarity>0 else decoder_columns_similarity_loss, 
-            "losses/classifier_loss": classifier_loss / self.cfg.lmbda_classifier if self.cfg.lmbda_classifier>0 else classifier_loss,
+            "losses/activation_rate_sparsity_loss": activation_rate_sparsity_loss, 
+            "losses/vcr_loss": vcr_loss , 
+            "losses/decoder_columns_similarity_loss": decoder_columns_similarity_loss, 
+            "losses/classifier_loss": classifier_loss,
             "losses/overall_loss": loss,
             # variance explained
             "metrics/explained_variance": explained_variance.mean().item(),
@@ -412,12 +440,13 @@ class SAETrainer:
     def _update_pbar(self, step_output: TrainStepOutput, pbar: tqdm, update_interval: int = 100): 
 
         if self.n_training_steps % update_interval == 0:
-
-            unscaled_mse_loss = (step_output.mse_loss * (1/self.cfg.lmbda_mse)) if (self.cfg.lmbda_mse > 0) else step_output.mse_loss
-            unscaled_classifier_loss = (step_output.classifier_loss *  (1/self.cfg.lmbda_classifier)) if (self.cfg.lmbda_classifier > 0) else step_output.classifier_loss
+            
+            mse_loss = step_output.mse_loss
+            classifier_loss = step_output.classifier_loss
+            activation_rate_sparsity_loss = step_output.activation_rate_sparsity_loss
 
             pbar.set_description(
-                f"Training steps {self.n_training_steps}| MSE Loss {unscaled_mse_loss:.3f} | Classifier loss {unscaled_classifier_loss:.3f}"
+                f"Training steps {self.n_training_steps}| MSE Loss {mse_loss:.3f} | Classifier loss {classifier_loss:.3f} | Act. Rate Loss {activation_rate_sparsity_loss:.3f}"
             )
             pbar.update(update_interval * self.cfg.train_batch_size_tokens)
 
@@ -470,11 +499,21 @@ class SentenceSAETrainingRunner:
       
 
         if self.cfg.log_to_wandb:
+
+            os.environ.update(
+                {
+                    "WANDB_MODE": "offline",
+                    "WANDB_PROJECT": f"{self.cfg.wandb_project}",
+                    "WANDB_RUN_NAME": f"{self.cfg.run_name}",
+                }
+            )
+
             wandb.init(
                 project=self.cfg.wandb_project,
                 config=cast(Any, self.cfg),
                 name=self.cfg.run_name,
                 id=self.cfg.wandb_id,
+                anonymous="allow",
             )
 
         trainer = SAETrainer(
@@ -511,7 +550,7 @@ class SentenceSAETrainingRunner:
                 self.model = torch.compile(
                     self.model,
                     mode=self.cfg.llm_compilation_mode,
-                )  # type: ignore
+                )  
 
         if self.cfg.compile_sae:
             if self.cfg.device == "mps":
@@ -519,11 +558,11 @@ class SentenceSAETrainingRunner:
             else:
                 backend = "inductor"
 
-            self.sae.training_forward_pass = torch.compile(  # type: ignore
+            self.sae.training_forward_pass = torch.compile( 
                 self.sae.training_forward_pass,
                 mode=self.cfg.sae_compilation_mode,
                 backend=backend,
-            )  # type: ignore
+            )  
 
     def run_trainer_with_interruption_handling(self, trainer: SAETrainer):
         try:
@@ -593,10 +632,13 @@ class SentenceSAETrainingRunner:
         save_file(log_feature_sparsities, log_feature_sparsity_path)
 
         if trainer.cfg.log_to_wandb and os.path.exists(log_feature_sparsity_path):
-            # Avoid wandb saving errors such as:
-            #   ValueError: Artifact name may only contain alphanumeric characters, dashes, underscores, and dots. Invalid name: sae_google/gemma-2b_etc
-            #sae_name = self.sae.get_name().replace("/", "__")
-            sae_name = 'my_sae'
+            
+            # Sanitize artifact name from run name
+            def _safe_wandb_name(name: str) -> str:
+                # allow only [A-Za-z0-9_.-], collapse others to underscore and trim length
+                return re.sub(r"[^A-Za-z0-9_.-]+", "_", name)[:128]
+            
+            sae_name = _safe_wandb_name(self.cfg.run_name or "sae")
             
             model_artifact = wandb.Artifact(
                 sae_name,
@@ -630,7 +672,7 @@ def geometric_median_objective(
     median: torch.Tensor, points: torch.Tensor, weights: torch.Tensor
 ) -> torch.Tensor:
 
-    norms = torch.linalg.norm(points - median.view(1, -1), dim=1)  # type: ignore
+    norms = torch.linalg.norm(points - median.view(1, -1), dim=1)  
 
     return (norms * weights).sum()
 
